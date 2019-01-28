@@ -19,8 +19,25 @@
                     elem.rect.fill = '#ff9191';
                 }
             }
-
         }
+
+        function successor(index, max) {
+            if (index < max - 1) {
+                return index + 1
+            } else {
+                return 0
+            }
+        }
+
+        function predecessor(index, max) {
+            if (index != 0) {
+                return index - 1
+            } else {
+                return max - 1
+            }
+        }
+
+        
 
         var two = new Two({
             fullscreen: true,
@@ -49,7 +66,8 @@
 
         var objects = drawArray(two, values);
         paintOddElements(values, objects);
-        var elem_id = 0;
+        var f_index = 0;
+        var l_index = objects.elements.length - 1;
 
         // two.update();
         // var svgString = content.innerHTML;
@@ -59,14 +77,24 @@
             e = e || window.event;
             // use e.keyCode
 
+            console.log(e)
             // console.log(e.keyCode)
 
-            if (elem_id < objects.elements.length - 1) {
-                elem_id = elem_id + 1
+            if ( ! e.shiftKey) {
+                if (e.keyCode == 39) {
+                    f_index = successor(f_index, objects.elements.length);
+                } else if (e.keyCode == 37) {
+                    f_index = predecessor(f_index, objects.elements.length);
+                }
             } else {
-                elem_id =  0
+                if (e.keyCode == 39) {
+                    l_index = successor(l_index, objects.elements.length);
+                } else if (e.keyCode == 37) {
+                    l_index = predecessor(l_index, objects.elements.length);
+                }
             }
-            moveIteratorTo(two, objects.its[0], objects.elements[elem_id])
+            moveIteratorTo(two, objects.its[0], objects.elements[f_index])
+            moveIteratorTo(two, objects.its[1], objects.elements[l_index])
         };        
         // document.onkeypress = function (e) {
         //     e = e || window.event;
@@ -74,12 +102,12 @@
 
         //     console.log(e.keyCode)
 
-        //     if (elem_id < objects.elements.length - 1) {
-        //         elem_id = elem_id + 1
+        //     if (f_index < objects.elements.length - 1) {
+        //         f_index = f_index + 1
         //     } else {
-        //         elem_id =  0
+        //         f_index =  0
         //     }
-        //     moveIteratorTo(two, objects.its[0], objects.elements[elem_id])
+        //     moveIteratorTo(two, objects.its[0], objects.elements[f_index])
         // }; 
         
     </script>
