@@ -109,6 +109,31 @@ function start(two) {
     };
 }
 
+// function drawArray(two, arr) {
+    
+//     var elements = []
+
+//     for (let index = 0; index < arr.length; ++index) {
+//         let value = arr[index];
+//         var e = drawElement(two,  100 + index * 80, 80, value);
+//         elements.push(e)
+//         // console.log(value);
+//     }
+
+//     var e_last = drawPastLast(two, 100 + arr.length * 80, 80);
+//     elements.push(e_last)
+
+//     var f = drawIterator(two, elements[0], "f");
+//     var l = drawIterator(two, e_last, "l", '#d80500');
+
+//     two.update();
+
+//     return {
+//         elements: elements,
+//         its: [f, l]
+//     };
+// }
+
 function drawArray(two, arr) {
     
     var elements = []
@@ -123,13 +148,7 @@ function drawArray(two, arr) {
     var e_last = drawPastLast(two, 100 + arr.length * 80, 80);
     elements.push(e_last)
 
-    var f = drawIterator(two, elements[0], "f");
-    var l = drawIterator(two, e_last, "l", '#d80500');
-
     two.update();
 
-    return {
-        elements: elements,
-        its: [f, l]
-    };
+    return elements;
 }

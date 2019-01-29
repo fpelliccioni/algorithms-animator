@@ -10,31 +10,25 @@
 
   <script src="../two.min.js"></script>
   <script src="../test.js"></script>
+  <script src="main.js"></script>
+
+
+  <script>
+    var compressed = (document.location.search == '?compressed');
+    if (compressed) {
+        document.write('<scr'+'ipt src="acorn_interpreter.js"></scr'+'ipt>');
+    } else {
+        document.write('<scr'+'ipt src="acorn.js"></scr'+'ipt>');
+        document.write('<scr'+'ipt src="interpreter.js"></scr'+'ipt>');
+    }
+    </script>    
 </head>
 <body>
-  <!-- <p><textarea id="code">
-var result = [];
-function fibonacci(n, output) {
-  var a = 1, b = 1, sum;
-  for (var  = 0; i &lt; n; i++) {
-    output.push(a);
-    sum = a + b;
-    a = b;
-    b = sum;
-  }
-}
-fibonacci(number, result);
-alert(result.join(', '));
-print(result.join(', '));
-
-</textarea><br> -->
-
-<p><textarea id="dataCode">
+    <textarea id="dataCode">
 var data = [1, 2, 3, 4];
-</textarea><br>
-        
+    </textarea>
 
-<p><textarea id="code">
+    <textarea id="code">
 function find(data, x) {
     // for (var i = 0; i &lt; data.length; ++i) {
     for (var i = 0; i &lt; data.length; i = successor(i)) {
@@ -45,223 +39,35 @@ function find(data, x) {
     return data.length;
 }
 
-<!-- var data = [1, 2, 3, 4]; -->
 var pos = find(data, 3);
 print(pos);
-</textarea><br>
+    </textarea>
+    <!-- <br> -->
 
-<pre><code id="code2" class="javascript"></code></pre>        
+    <pre><code id="code2" class="javascript"></code></pre>        
 
+    <button id="parseButton" onclick="parseButton()">Parse</button>
+    <button id="stepButton" onclick="stepButton()" disabled="disabled">Step</button>
+    <button id="runButton" onclick="runButton()" disabled="disabled">Run</button>
 
-    <button onclick="parseButton()">Parse</button>
-    <button onclick="stepButton()" id="stepButton" disabled="disabled">Step</button>
-    <button onclick="runButton()" id="runButton" disabled="disabled">Run</button>
-  <!-- </p> -->
+    <div id="sequence"></div>
 
-  <div id="content"></div>
-
-  <script>
-
-        // document.addEventListener('DOMContentLoaded', (event) => {
-        //     document.querySelectorAll('pre code').forEach((block) => {
-        //         hljs.highlightBlock(block);
-        //     });
-        // });
-    
+    <script>
         var objects;
+        var lines = [];
+        var prevLine = "";
+        var myInterpreter;
+
+        // var two = new Two({
+        //         fullscreen: false,
+        //         autostart: true
+        // });
+
         var two = new Two({
                 fullscreen: false,
                 autostart: true
-            }).appendTo(content);
-        
-    
-        var lines = [];
-        var prevLine = "";
-        // var number = 2;
-        // Depending on the URL argument, test the compressed or uncompressed version.
-        var compressed = (document.location.search == '?compressed');
-        if (compressed) {
-            document.write('<scr'+'ipt src="acorn_interpreter.js"></scr'+'ipt>');
-        } else {
-            document.write('<scr'+'ipt src="acorn.js"></scr'+'ipt>');
-            document.write('<scr'+'ipt src="interpreter.js"></scr'+'ipt>');
-        }
-    
-        var myInterpreter;
-        function initAlert(interpreter, scope) {
-            var alert_wrapper = function(text) {
-                return alert(arguments.length ? text : '');
-            };
-    
-            var print_wrapper = function(text) {
-                return console.log(arguments.length ? text : '');
-            };
+        }).appendTo(sequence);
 
-            var successor_wrapper = function(i) {
-                // if (index < max - 1) {
-                //     return index + 1
-                // } else {
-                //     return 0
-                // }
-                // f_index = successor(f_index, objects.elements.length);
-
-
-                i = i + 1
-                moveIteratorTo(two, objects.its[0], objects.elements[i])
-                return i
-
-
-                return console.log(arguments.length ? text : '');
-            };
-
-            // interpreter.setProperty(scope, 'number', String(location));
-            interpreter.setProperty(scope, 'number', 16);
-            interpreter.setProperty(scope, 'alert', interpreter.createNativeFunction(alert_wrapper));
-            interpreter.setProperty(scope, 'print', interpreter.createNativeFunction(print_wrapper));
-            interpreter.setProperty(scope, 'successor', interpreter.createNativeFunction(successor_wrapper));
-            
-        }
-    
-        function getAllCode() {
-            var dataCode = document.getElementById('dataCode').value;
-            var code = document.getElementById('code').value;
-            return dataCode + '\n' + code;
-        }
-
-        function parseButton() {
-            // var dataCode = document.getElementById('dataCode').value;
-            // var code = document.getElementById('code').value;
-            var code = getAllCode();
-            document.getElementById('dataCode').style.display = "none";
-            document.getElementById('code').style.display = "none";
-    
-            var yyy = eval(document.getElementById('dataCode').value);
-            console.log(data)
-            // var values = [1, 3, 2, 4, 5, 7, 6, 8];
-            // var objects = drawArray(two, data);
-            objects = drawArray(two, data);
-
-
-
-            var code2 = document.getElementById('code2');
-            code2.innerHTML = code;
-            hljs.highlightBlock(code2);
-    
-            myInterpreter = new Interpreter(code, initAlert);
-            disable('');
-        }
-    
-        function stepButton() {
-            while (true) {
-                if (myInterpreter.stateStack.length) {
-                    // console.log("stepButton 1");
-                    var node = myInterpreter.stateStack[myInterpreter.stateStack.length - 1].node;
-                    var start = node.start;
-                    var end = node.end;
-                } else {
-                    // console.log("stepButton 2");
-                    var start = 0;
-                    var end = 0;
-                }
-                // createSelection(start, end);
-    
-                // var code = document.getElementById('code').value;
-                var code = getAllCode();
-                var codeSelected = code.substring(start, end);
-                // console.log(codeSelected);
-    
-                var codeHtml = [code.slice(0, end), "</mark>", code.slice(end)].join('');
-                    codeHtml = [codeHtml.slice(0, start), "<mark>", codeHtml.slice(start)].join('');
-                // console.log(codeHtml);
-                var code2 = document.getElementById('code2');
-                code2.innerHTML = codeHtml;
-                hljs.highlightBlock(code2);
-    
-                try {
-                    var ok = myInterpreter.step();
-                } finally {
-                    if (!ok) {
-                        disable('disabled');
-                        console.log('break 2')
-                        break;
-                    }
-                }
-    
-                if (codeSelected.length == 1) {
-                    // console.log('continue 1')
-                    continue;
-                }
-    
-                var countLineEnd = (codeSelected.match(/\n/g) || []).length;
-                // console.log(countLineEnd);
-    
-                if (countLineEnd > 1) {
-                    // console.log('continue 2')
-                    continue;
-                }
-    
-                if (codeSelected[0] == '[' && codeSelected[codeSelected.length - 1] == ']') {
-                    // console.log('continue 3')
-                    continue;
-                }
-    
-                // if (lines.indexOf(codeSelected) != -1) {
-                //     continue;
-                // }
-                // var found = lines.findIndex(function(l) {
-                //     return l.includes(codeSelected);
-                // });
-                // if (found != -1) {
-                //     continue;
-                // }
-    
-                console.log(prevLine)
-                console.log(codeSelected)
-                if (prevLine.includes(codeSelected)) {
-                    // prevLine = codeSelected;
-                    // console.log('continue 4')
-                    continue;
-                }
-                prevLine = codeSelected;
-    
-    
-                // if (countLineEnd == 0) {
-                //     break;
-                // }
-    
-                // lines.push(codeSelected);
-    
-                // console.log('break 1')
-                break;
-            }
-        }
-    
-        function runButton() {
-            disable('disabled');
-            myInterpreter.run();
-        }
-    
-        function disable(disabled) {
-            document.getElementById('stepButton').disabled = disabled;
-            document.getElementById('runButton').disabled = disabled;
-        }
-    
-        function createSelection(start, end) {
-            var field = document.getElementById('code');
-            if (field.createTextRange) {
-                var selRange = field.createTextRange();
-                selRange.collapse(true);
-                selRange.moveStart('character', start);
-                selRange.moveEnd('character', end);
-                selRange.select();
-            } else if (field.setSelectionRange) {
-                field.setSelectionRange(start, end);
-            } else if (field.selectionStart) {
-                field.selectionStart = start;
-                field.selectionEnd = end;
-            }
-            field.focus();
-        }
-      </script>  
+    </script>  
 </body>
 </html>

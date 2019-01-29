@@ -12,8 +12,50 @@ body {
   #code {
     font-family: monospace;
     font-size: larger;
-    height: 15em;
+    height: 20em;
+    width: 100%;
+    max-width: 111ex;
+  }
+  #dataCode {
+    font-family: monospace;
+    font-size: larger;
+    height: 3em;
     width: 100%;
     max-width: 111ex;
   }
   
+  #parseButton {
+    border: 0;
+    background: none;
+    box-shadow: none;
+    border-radius: 0px;
+    /* color: #bfffb3; */
+    background-color: cornflowerblue;
+    height: 3em;
+    width: 10em;
+
+   }
+
+   #stepButton {
+    border: 0;
+    background: none;
+    box-shadow: none;
+    border-radius: 0px;
+    /* color: #bfffb3; */
+    background-color: cornflowerblue;
+    height: 3em;
+    width: 10em;
+
+   }
+
+   #runButton {
+    border: 0;
+    background: none;
+    box-shadow: none;
+    border-radius: 0px;
+    /* color: #bfffb3; */
+    background-color: cornflowerblue;
+    height: 3em;
+    width: 10em;
+
+   }
