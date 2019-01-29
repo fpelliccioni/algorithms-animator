@@ -6,6 +6,13 @@
   <!-- <link href="demos/style.css" rel="stylesheet" type="text/css"> -->
   <link href="style.css" rel="stylesheet" type="text/css">
 
+  <!-- <link rel="stylesheet" href="/path/to/styles/default.css"> -->
+  <!-- <script src="/path/to/highlight.pack.js"></script> -->
+  <!-- <script>hljs.initHighlightingOnLoad();</script> -->
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+
   <script>
     var lines = [];
     var prevLine = "";
@@ -37,6 +44,15 @@
 
     function parseButton() {
         var code = document.getElementById('code').value;
+
+        // document.getElementById('code2').innerHTML = "Your HTML here";
+        // document.getElementById('code2').value = code;
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        });        
+
         myInterpreter = new Interpreter(code, initAlert);
         disable('');
     }
@@ -64,6 +80,8 @@
             } finally {
                 if (!ok) {
                     disable('disabled');
+                    console.log('break 2')
+                    break;
                 }
             }
 
@@ -154,7 +172,7 @@
 var result = [];
 function fibonacci(n, output) {
   var a = 1, b = 1, sum;
-  for (var i = 0; i &lt; n; i++) {
+  for (var  = 0; i &lt; n; i++) {
     output.push(a);
     sum = a + b;
     a = b;
@@ -183,6 +201,21 @@ alert(pos);
 print(pos);
         </textarea><br>
         
+<pre><code id="code2" class="javascript">
+function find(data, x) {
+    for (var i = 0; i &lt; data.length; ++i) {
+        if (data[i] == x) {
+            return i;
+        }
+    }
+    return data.length;
+}
+
+var data = [1, 2, 3, 4];
+var pos = find(data, 3);
+alert(pos);
+print(pos);    
+</code></pre>        
 
 <button onclick="parseButton()">Parse</button>
   <button onclick="stepButton()" id="stepButton" disabled="disabled">Step</button>
