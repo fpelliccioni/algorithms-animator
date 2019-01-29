@@ -17,7 +17,8 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
 
     // var text = two.makeText(text, x, y + 15);
     var text = two.makeText(text, x, y);
-    text.family = "DejaVu Sans Mono"
+    // text.family = "DejaVu Sans Mono"
+    text.family = "Consolas"
     text.size = 100
     text.alignment = 'center'
     text.baseline = 'middle'
@@ -51,18 +52,20 @@ function drawPastLast(two, x, y) {
 function drawIterator(two, elem, text, color = '#000075') {
     
     var x = elem.rect.translation._x;
-    var y = elem.rect.translation._y + elem.rect.height / 2 + 50;
+    var y = elem.rect.translation._y + elem.rect.height / 2 + 30;
 
-    var tri = two.makePolygon(x, y, 15)
+    var tri = two.makePolygon(x, y, 8)
     tri.fill = color;
     tri.noStroke();
 
-    var line = two.makeLine(x, y + 15, x, y+115);
+    var line = two.makeLine(x, y + 8, x, y + 50);
     line.stroke = color;
 
-    var text = two.makeText(text, x, y + 115 + 120);
-    text.family = "DejaVu Sans Mono"
-    text.size = 100
+    var text = two.makeText(text, x, y + 100);
+    // text.family = "DejaVu Sans Mono"
+    text.family = "Consolas"
+    
+    text.size = 80
     text.alignment = 'center'
     text.baseline = 'middle'
     text.fill = color;
