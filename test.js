@@ -6,7 +6,7 @@
 // }
 
 function drawElement(two, x, y, text, color = '#bfffb3') {
-    var rect = two.makeRectangle(x, y, 160, 240);
+    var rect = two.makeRectangle(x, y, 80, 120);
     rect.fill = color;
     rect.stroke = 'black'
     rect.linewidth = 1;
@@ -15,9 +15,10 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
     // console.log(rect.translation._x)
 
 
-    var text = two.makeText(text, x, y + 15);
+    // var text = two.makeText(text, x, y + 15);
+    var text = two.makeText(text, x, y);
     text.family = "DejaVu Sans Mono"
-    text.size = 200
+    text.size = 100
     text.alignment = 'center'
     text.baseline = 'middle'
 
@@ -32,7 +33,7 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
 }
 
 function drawPastLast(two, x, y) {
-    var rect = two.makeRectangle(x, y, 160, 240);
+    var rect = two.makeRectangle(x, y, 80, 120);
     rect.fill = '#cacaca';
     rect.stroke = 'black'
     rect.linewidth = 1;
@@ -61,7 +62,7 @@ function drawIterator(two, elem, text, color = '#000075') {
 
     var text = two.makeText(text, x, y + 115 + 120);
     text.family = "DejaVu Sans Mono"
-    text.size = 200
+    text.size = 100
     text.alignment = 'center'
     text.baseline = 'middle'
     text.fill = color;
@@ -80,19 +81,19 @@ function moveIteratorTo(two, it, elem) {
 
 function start(two) {
 
-    // var circle = two.makeCircle(500, 160, 120);
+    // var circle = two.makeCircle(500, 80, 120);
     // circle.fill = '#FF8000';
     // circle.stroke = 'orangered'; // Accepts all valid css color
     // circle.linewidth = 5;
 
-    var e0 = drawElement(two,  200 + 0 * 160, 160, "0");
-    var e1 = drawElement(two,  200 + 1 * 160, 160, "1");
-    var e2 = drawElement(two,  200 + 2 * 160, 160, "3");
-    var e3 = drawElement(two,  200 + 3 * 160, 160, "5");
-    var e4 = drawElement(two,  200 + 4 * 160, 160, "6", '#ff9191');
-    var e5 = drawElement(two,  200 + 5 * 160, 160, "9");
-    var e6 = drawPastLast(two, 200 + 6 * 160, 160);
-    // var e7 = drawPastLast(two, 200 + 7 * 160, 160);
+    var e0 = drawElement(two,  100 + 0 * 80, 80, "0");
+    var e1 = drawElement(two,  100 + 1 * 80, 80, "1");
+    var e2 = drawElement(two,  100 + 2 * 80, 80, "3");
+    var e3 = drawElement(two,  100 + 3 * 80, 80, "5");
+    var e4 = drawElement(two,  100 + 4 * 80, 80, "6", '#ff9191');
+    var e5 = drawElement(two,  100 + 5 * 80, 80, "9");
+    var e6 = drawPastLast(two, 100 + 6 * 80, 80);
+    // var e7 = drawPastLast(two, 100 + 7 * 80, 80);
     
     // console.log(e1.width)
 
@@ -111,12 +112,12 @@ function drawArray(two, arr) {
 
     for (let index = 0; index < arr.length; ++index) {
         let value = arr[index];
-        var e = drawElement(two,  200 + index * 160, 160, value);
+        var e = drawElement(two,  100 + index * 80, 80, value);
         elements.push(e)
         // console.log(value);
     }
 
-    var e_last = drawPastLast(two, 200 + arr.length * 160, 160);
+    var e_last = drawPastLast(two, 100 + arr.length * 80, 80);
     elements.push(e_last)
 
     var f = drawIterator(two, elements[0], "f");
