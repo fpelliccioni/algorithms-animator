@@ -24,39 +24,163 @@
     </script>    
 </head>
 <body>
-    <textarea id="dataCode">
-var data = [1, 2, 3, 4];
-    </textarea>
 
-    <textarea id="code">
-function find(data, x) {
-    // for (var i = 0; i &lt; data.length; ++i) {
-    for (var i = 0; i &lt; data.length; i = successor(i)) {
-        if (data[i] == x) {
-            return i;
-        }
+
+<!-- 
+function partition_semistable(f, l, p) {
+    while (true) {
+        if (equal(f, l)) return f;
+        if (p(source(f))) break;
+        f = successor(f);
     }
-    return data.length;
+
+    //var j = f; 
+    var j = copy_it(f, 'j', '#9000d8');
+    j = successor(j)
+
+    while ( ! equal(j, l)) {
+        if ( ! p(source(j))) {
+            iter_swap(f, j);
+            f = successor(f);
+        }
+        j = successor(j);
+    }
+
+    remove_it(j);   //GUI stuff
+
+    return f;
 }
 
-var pos = find(data, 3);
-print(pos);
+// var it = partition_semistable(f, l, function(x) {return x % 2 == 0;});
+
+// var it = find_if(f, l, function(x) {return x % 2 == 0;});
+//if ( ! equal(it, l)) {
+//    print(source(it));
+//}
+
+function find_backward_if(f, l, p) {
+    while ( ! equal(l, f) && ! p(source(predecessor(l, false)))) {
+        l = predecessor(l);
+    }
+    return l;
+}
+
+//var it = find_backward_if(f, l, function(x) {return x % 2 == 0;});
+//if ( ! equal(it, l)) {
+//    print(source(predecessor(it, false)));
+//}
+
+
+function find(f, l, x) {
+    while ( ! equal(f, l)) {
+        if (source(f) == x) {
+            return f;
+        }
+        f = successor(f)
+    }
+    return f;
+} -->
+
+    <div id="leftPart" class="leftMain">
+            <p>
+                    <textarea id="dataCode">
+data = [1, 3, 5, 2, 4, 8, 7, 2, 1, 3, 5, 2, 7, 8, 4];
+pred = function(x) {return x % 2 == 0;};
     </textarea>
-    <!-- <br> -->
+    </p>
 
-    <pre><code id="code2" class="javascript"></code></pre>        
+    <textarea id="code">
+function find_if(f, l, p) {
+    while ( ! equal(f, l)) {
+        if (p(source(f))) {
+            return f;
+        }
+        f = successor(f)
+    }
+    return f;
+}
 
-    <button id="parseButton" onclick="parseButton()">Parse</button>
-    <button id="stepButton" onclick="stepButton()" disabled="disabled">Step</button>
-    <button id="runButton" onclick="runButton()" disabled="disabled">Run</button>
+function find_backward_if_not(f, l, p) {
+    while ( ! equal(l, f) && p(source(predecessor(l, false)))) {
+        l = predecessor(l);
+    }
+    return l;
+}
 
-    <div id="sequence"></div>
+function partition_bidirectional_unguarded(f, l, p) {
+    while(true) {
+
+//      while (p(*f)) ++f;
+        while ( ! p(source(f))) {
+            f = successor(f)
+        }
+
+//      while (!p(*--l));
+        l = predecessor(l);
+        while (p(source(l))) {
+            l = predecessor(l);
+        }
+
+//      if (++l == f) return f;
+        l = successor(l);
+        if ( equal(l, f)) return f;
+
+//      swap(*f++, *--l);
+
+        l = predecessor(l);
+        iter_swap(f, l);
+        f = successor(f)
+    }
+}
+
+function partition_bidirectional_optimized(f, l, p) {
+    /*
+    f = find_if_not(f, l, p);
+    l = find_backward_if(f, l, p);
+    if (f == l) return f;
+    swap(*f, *--l);
+    return partition_bidirectional_unguarded(++f, l, p);
+    */
+
+    f = find_if(f, l, p);
+    l = find_backward_if_not(f, l, p);
+    if (equal(f, l)) return f;
+    l = predecessor(l);
+    iter_swap(f, l);
+    f = successor(f)
+    return partition_bidirectional_unguarded(f, l, p);
+
+}
+
+//function pred(x) {return x % 2 == 0;};
+//paint_data_pred(pred);
+
+var f = begin(data, "f");
+var l = end(data, "l", "#d80500");
+var it = partition_bidirectional_optimized(f, l, pred);
+                    </textarea>
+                    <!-- <br> -->        
+        <pre><code id="code2" class="javascript"></code></pre>
+        <button id="parseButton" onclick="parseButton()">Parse</button>
+        <button id="stepButton" onclick="stepButton()" disabled="disabled">Step</button>
+        <button id="runButton" onclick="runButton()" disabled="disabled">Run</button>
+    </div>
+
+    <div id="rightPart" class="rightMain">
+        <div id="sequence"></div>
+    </div>
+    
+
+
 
     <script>
-        var objects;
+        var elements;
         var lines = [];
         var prevLine = "";
         var myInterpreter;
+        var iterators = {};
+        var data = [];
+        var pred;
 
         // var two = new Two({
         //         fullscreen: false,
@@ -65,8 +189,24 @@ print(pos);
 
         var two = new Two({
                 fullscreen: false,
+                width: document.getElementById('sequence').offsetWidth,
+                height: 600,
                 autostart: true
         }).appendTo(sequence);
+
+        document.onkeypress = function (e) {
+            e = e || window.event;
+            // console.log(e.keyCode)
+            // console.log(document.getElementById('stepButton').disabled);
+            if (e.keyCode == 13) {
+                if (document.getElementById('stepButton').disabled) {
+                    parseButton()
+                }
+                if ( ! document.getElementById('stepButton').disabled) {
+                    stepButton();
+                }
+            }
+        }
 
     </script>  
 </body>

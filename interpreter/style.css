@@ -9,12 +9,20 @@ body {
   h1, h2, h3 {
     font-weight: normal;
   }
+
+  #code2 {
+    /* float:left; */
+    width: 100%;
+  }
+
   #code {
+    /* float:left; */
     font-family: monospace;
     font-size: larger;
-    height: 20em;
+    height: 50em;
     width: 100%;
     max-width: 111ex;
+    /* background-color: black; */
   }
   #dataCode {
     font-family: monospace;
@@ -23,7 +31,26 @@ body {
     width: 100%;
     max-width: 111ex;
   }
-  
+
+
+#leftPart{
+    float:left;
+    width: 30%;
+ }
+
+ #rightPart{
+    float:right;
+    width: 70%;
+ }
+ 
+ 
+#sequence {
+    /* float:right; */
+    /* width: 80%; */
+  } 
+
+
+
   #parseButton {
     border: 0;
     background: none;
