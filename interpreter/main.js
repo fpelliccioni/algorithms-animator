@@ -10,22 +10,23 @@ function initAlert(interpreter, scope) {
     };
 
     var print_wrapper = function(text) {
-        return console.log(arguments.length ? text : '');
+
+        var output = document.getElementById('output');
+        output.innerHTML = output.innerHTML + text + '<br />';
+        hljs.highlightBlock(output);
+
+        console.log(arguments.length ? text : '');
     };
 
     var successor_wrapper = function(it, move = true) {
-        // // if (index < max - 1) {
-        // //     return index + 1
-        // // } else {
-        // //     return 0
-        // // }
-        // // f_index = successor(f_index, objects.elements.length);
+        var max = it.data.properties['length'];
 
-        // // console.log(it);
-        // it.index = it.index + 1
-        // // console.log(it);
-        // moveIteratorTo(two, iterators[it.name], elements[it.index])
-        // return it
+        console.log(it.index)
+        if (it.index >= max) {
+            print_wrapper('ERROR: out of range');
+            disable('disabled');
+            return;
+        }
 
         if (move) {
             moveIteratorTo(two, iterators[it.name], elements[it.index + 1])
@@ -34,17 +35,12 @@ function initAlert(interpreter, scope) {
     };
 
     var predecessor_wrapper = function(it, move = true) {
-        // if (index < max - 1) {
-        //     return index + 1
-        // } else {
-        //     return 0
-        // }
-        // f_index = successor(f_index, objects.elements.length);
-
-        // it.index = it.index - 1
-        // moveIteratorTo(two, iterators[it.name], elements[it.index])
-
-        // console.log(it);
+        console.log(it.index)
+        if (it.index <= 0) {
+            print_wrapper('ERROR: out of range');
+            disable('disabled');
+            return;
+        }
 
         if (move) {
             moveIteratorTo(two, iterators[it.name], elements[it.index - 1])
@@ -72,6 +68,15 @@ function initAlert(interpreter, scope) {
     };
 
     var source_wrapper = function(it) {
+
+        var max = it.data.properties['length'];
+        if (it.index >= max) {
+            print_wrapper('ERROR: not valid iterator to take the source');
+            disable('disabled');
+            return;
+        }
+
+
         var s = it.data.properties[it.index];
         return s;
     };
@@ -110,13 +115,16 @@ function initAlert(interpreter, scope) {
         // console.log(source_wrapper(a))
         // console.log(source_wrapper(b))
         
-
+        // console.log(data)
         var tmp = source_wrapper(a);
-        data[a.index] = source_wrapper(b);
+        // data[a.index] = source_wrapper(b);
+        data.properties[a.index] = source_wrapper(b);
         elements[a.index].group.children[1].value = source_wrapper(b);
 
-        data[b.index] = tmp;
+        // data[b.index] = tmp;
+        data.properties[b.index] = tmp;
         elements[b.index].group.children[1].value = tmp;
+        // console.log(data)
 
 
 
@@ -163,9 +171,9 @@ function initAlert(interpreter, scope) {
 }
 
 function getAllCode() {
-    var dataCode = document.getElementById('dataCode').value;
-    var code = document.getElementById('code').value;
-    return dataCode + '\n' + code;
+    var dataCodeText = document.getElementById('dataCodeArea').value;
+    var codeText = document.getElementById('codeArea').value;
+    return dataCodeText + '\n' + codeText;
 }
 
 function paint_data_pred(p) {
@@ -184,28 +192,53 @@ function paint_data_pred(p) {
     }
 }
 
-function parseButton() {
+function editButton() {
+    document.getElementById('dataCodeArea').style.display = "inline";
+    document.getElementById('codeArea').style.display = "inline";
+    document.getElementById('codeHighlightPre').style.display = "none";
+
+    document.getElementById('startButton').style.display = "inline";
+    document.getElementById('stepButton').style.display = "none";
+    document.getElementById('editButton').style.display = "none";
+
+    two.clear();
+}
+
+function startButton() {
     var code = getAllCode();
-    document.getElementById('dataCode').style.display = "none";
-    document.getElementById('code').style.display = "none";
+    document.getElementById('dataCodeArea').style.display = "none";
+    document.getElementById('codeArea').style.display = "none";
+    document.getElementById('codeHighlightPre').style.display = "block";
+
+    document.getElementById('startButton').style.display = "none";
+    document.getElementById('stepButton').style.display = "inline";
+    document.getElementById('editButton').style.display = "inline";
+      
 
     // console.log(data)
-    var yyy = eval(document.getElementById('dataCode').value);
+    var yyy = eval(document.getElementById('dataCodeArea').value);
     // console.log(data)
     two.clear();
     elements = drawArray(two, data);
 
     paint_data_pred(pred);
 
-    var code2 = document.getElementById('code2');
-    code2.innerHTML = code;
-    hljs.highlightBlock(code2);
+    var codeHighlight = document.getElementById('codeHighlight');
+    codeHighlight.innerHTML = code;
+    hljs.highlightBlock(codeHighlight);
+
+    var output = document.getElementById('output');
+    hljs.highlightBlock(output);
 
     myInterpreter = new Interpreter(code, initAlert);
     disable('');
 }
 
 function stepButton() {
+    var codeHighlight = document.getElementById('codeHighlight');
+    console.log(codeHighlight.innerHTML)
+
+
     while (true) {
         if (myInterpreter.stateStack.length) {
             // console.log("stepButton 1");
@@ -229,15 +262,15 @@ function stepButton() {
                 disable('disabled');
                 // console.log('break 2')
 
-                var code2 = document.getElementById('code2');
-                code2.innerHTML = code;
-                hljs.highlightBlock(code2);
+                var codeHighlight = document.getElementById('codeHighlight');
+                codeHighlight.innerHTML = code;
+                hljs.highlightBlock(codeHighlight);
         
                 break;
             }
         }
 
-        // var code = document.getElementById('code').value;
+        // var code = document.getElementById('codeArea').value;
         var code = getAllCode();
         var codeSelected = code.substring(start, end);
         // console.log(codeSelected);
@@ -245,9 +278,9 @@ function stepButton() {
         var codeHtml = [code.slice(0, end), "</mark>", code.slice(end)].join('');
             codeHtml = [codeHtml.slice(0, start), "<mark>", codeHtml.slice(start)].join('');
         // console.log(codeHtml);
-        var code2 = document.getElementById('code2');
-        code2.innerHTML = codeHtml;
-        hljs.highlightBlock(code2);
+        var codeHighlight = document.getElementById('codeHighlight');
+        codeHighlight.innerHTML = codeHtml;
+        hljs.highlightBlock(codeHighlight);
 
 
         if (codeSelected.length == 1) {
@@ -310,7 +343,7 @@ function disable(disabled) {
 }
 
 function createSelection(start, end) {
-    var field = document.getElementById('code');
+    var field = document.getElementById('codeArea');
     if (field.createTextRange) {
         var selRange = field.createTextRange();
         selRange.collapse(true);

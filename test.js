@@ -1,4 +1,4 @@
-var leftMargin = 80;
+var leftMargin = 30;
 
 // var rectWidth = 80;
 // var rectHeight = 120;
@@ -7,6 +7,10 @@ var leftMargin = 80;
 var rectWidth = 40;
 var rectHeight = 60;
 var fontSize = 50;
+var pointerFontSize = 40;
+
+var pointerTriangleSize = 5;
+
 
 function drawElement(two, x, y, text, color = '#bfffb3') {
     var rect = two.makeRectangle(x, y, rectWidth, rectHeight);
@@ -56,24 +60,23 @@ function drawPastLast(two, x, y) {
 }
 
 function drawIterator(two, elem, text, color = '#000075') {
-    
     var x = elem.rect.translation._x;
-    var y = elem.rect.translation._y + elem.rect.height / 2 + 30;
+    var y = elem.rect.translation._y + elem.rect.height / 2 + 20;
 
-    var tri = two.makePolygon(x, y, 8)
+    var tri = two.makePolygon(x, y, pointerTriangleSize)
     tri.fill = color;
     tri.noStroke();
 
-    var line = two.makeLine(x, y + 8, x, y + 50);
+    var line = two.makeLine(x, y + pointerTriangleSize, x, y + 50);
     line.stroke = color;
 
-    var text = two.makeText(text, x, y + 100);
+    var text = two.makeText(text, x, y + 80);
     // text.family = "DejaVu Sans Mono"
     // text.family = "Consolas"
     // text.family = "Lucida Console"
     text.family = "Courier"
     
-    text.size = fontSize //80
+    text.size = pointerFontSize //80
     text.alignment = 'center'
     text.baseline = 'middle'
     text.fill = color;
@@ -96,13 +99,13 @@ function moveIteratorTo(two, it, elem) {
 
 function start(two) {
 
-    var e0 = drawElement(two,  leftMargin + 0 * rectWidth, rectWidth, "0");
-    var e1 = drawElement(two,  leftMargin + 1 * rectWidth, rectWidth, "1");
-    var e2 = drawElement(two,  leftMargin + 2 * rectWidth, rectWidth, "3");
-    var e3 = drawElement(two,  leftMargin + 3 * rectWidth, rectWidth, "5");
-    var e4 = drawElement(two,  leftMargin + 4 * rectWidth, rectWidth, "6", '#ff9191');
-    var e5 = drawElement(two,  leftMargin + 5 * rectWidth, rectWidth, "9");
-    var e6 = drawPastLast(two, leftMargin + 6 * rectWidth, rectWidth);
+    var e0 = drawElement(two, leftMargin + 0 * rectWidth, rectWidth, "0");
+    var e1 = drawElement(two, leftMargin + 1 * rectWidth, rectWidth, "1");
+    var e2 = drawElement(two, leftMargin + 2 * rectWidth, rectWidth, "3");
+    var e3 = drawElement(two, leftMargin + 3 * rectWidth, rectWidth, "5");
+    var e4 = drawElement(two, leftMargin + 4 * rectWidth, rectWidth, "6", '#ff9191');
+    var e5 = drawElement(two, leftMargin + 5 * rectWidth, rectWidth, "9");
+    var e6 = drawPastLast(two,leftMargin + 6 * rectWidth, rectWidth);
     // var e7 = drawPastLast(two, leftMargin + 7 * rectWidth, rectWidth);
     
     // console.log(e1.width)
