@@ -30,35 +30,88 @@ body {
   background: #23241f;
   position:fixed;   
   border-top: 1px solid #009900;
+  margin:0; padding:0;
 }
+
+#Buttons { 
+    height:60%;
+    /* background:pink; */
+    top: 0%;
+    margin:0; padding:0;
+    position: relative;
+}
+
+#CopyrightDiv {
+    /* height:20%; */
+    /* background:orange; */
+    bottom: 0%;
+    margin:0; padding:0;
+    position: relative;
+}
+
+
 
 #NE { 
   top:0;   
   left:40%; 
   width:60%; 
-  height:28%;
+  height: 32%;
   background:blue;
   position:fixed;
 }
 
 #ME { 
-  top:28%;   
-  left:40%; 
-  width:60%; 
-  height:32%;
-  background:#009900;
-  position:fixed;
-}
-
-#SE { 
-  top:60%; 
+  top:32%;   
   left:40%; 
   width:60%; 
   height:40%;
+  background: #23241f;
+  position:fixed;
+  border-left: 1px solid #009900;
+  border-top: 1px solid #009900;
+  /* text-align:center; */
+}
+
+#SE { 
+  top:72%; 
+  left:40%; 
+  width:60%; 
+  height:28%;
   background:#23241f;
   position:fixed;
   border-left: 1px solid #009900;
+  border-top: 1px solid #009900;
 } 
+
+#MEW { 
+    /* top:0%;    */
+    /* left:0%;  */
+    width:50%; 
+    height:100%;
+    background: #23241f;
+    /* background: pink; */
+    /* position: relative; */
+    float: left;
+    /* border-left: 1px solid #009900; */
+    /* border-top: 1px solid #009900; */
+    /* display: inline; */
+    /* text-align:left; */
+  }
+
+#MEE { 
+    /* top:0%;    */
+    /* left:50%;  */
+    width:50%; 
+    height:100%;
+    background: #23241f;
+    /* background: orange; */
+    /* position:relative; */
+    float: right;
+    /* border-left: 1px solid #009900; */
+    /* border-top: 1px solid #009900; */
+    /* display:inline; */
+}
+
 
 a:hover {
   color: red;
@@ -66,6 +119,31 @@ a:hover {
 
 h1, h2, h3 {
   font-weight: normal;
+}
+
+p {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12pt;
+    margin:0; 
+    padding:0;
+}
+
+#Copyright {
+    font-family: "Source Code Pro", monospace;
+    font-size: 8pt;
+    margin:0; 
+    padding:0;
+    color: #009900;
+    text-align: center;
+}
+
+#Status {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12pt;
+    margin:0; 
+    padding:0;
+    color: #009900;
+    /* text-align: center; */
 }
 
 
@@ -108,8 +186,16 @@ h1, h2, h3 {
 
   border: none;
   resize: none;
-
 }
+
+#dataCodeArea:focus {
+    outline: none !important;
+    /* border:1px solid red; */
+    /* box-shadow: 0 0 10px #719ECE; */
+    border: none;
+    box-shadow: none;
+}
+
 
 #codeArea {
   /* float:left; */
@@ -122,12 +208,22 @@ h1, h2, h3 {
   background-color: #23241f;
   color: white;
   /* color: #009900; */
-  border-top: #009900;
+  border-top: 1px solid #009900;
   border-left: none;
+  border-right: none;
 
+  margin-top: 1em;
 
   /* border: none; */
   resize: none;
+}
+
+#codeArea:focus {
+    outline: none !important;
+    /* border:1px solid red; */
+    /* box-shadow: 0 0 10px #719ECE; */
+    border: none;
+    box-shadow: none;
 }
 
 #codeHighlightPre {

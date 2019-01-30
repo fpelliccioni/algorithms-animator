@@ -31,24 +31,39 @@
         <pre id="codeHighlightPre"><code id="codeHighlight" class="javascript"></code></pre>
         
         <textarea id="dataCodeArea">
-data = [1, 1];
-pred = function(x) {return x % 2 == 0;};
+data = [3, 2, 7, 3, 2, 1, 5, 7];
+//pred = function(x) {return x % 2 == 0;};
+rel = function(x, y) {
+    return x &lt; y;
+};
         </textarea>
 
         <textarea id="codeArea">
-function find_if_unguarded(f, p) {
-    while ( ! p(source(f))) {
-        f = successor(f)
+function min_element(f, l, r) {
+
+    if (equal(f, l)) return l;
+ 
+    //I m = f++;
+    var m = copy_it(f, 'm', '#9000d8');
+    f = successor(f);
+
+    while ( ! equal(f, l)) {
+        if (r(source(f), source(m))) {
+            m = assign_it(m, f);
+        }
+        f = successor(f);
     }
-    return f;
+    remove_it(m);
+    return m;
 }
 
 var f = begin(data, "f");
-//f = predecessor(f)
-//f  = predecessor(f)
-//f   = predecessor(f)
-var it = find_if_unguarded(f, pred);
-//print(source(it))
+var l = end(data, "l", "#d80500");
+
+f = assign_it(f, min_element(f, l, rel));
+if ( ! equal(f, l)) {
+    print("The min element is: " + source(f));
+}
         </textarea>
         
     </div>
@@ -56,14 +71,21 @@ var it = find_if_unguarded(f, pred);
         <div id="sequence"></div>
     </div>
     <div id="SW">
-        <!-- <hr /> -->
-        <button id="startButton" onclick="startButton()">Start</button>
-        <button id="stepButton" onclick="stepButton()" disabled="disabled">Step</button>
-        <button id="editButton" onclick="editButton()">Edit</button>
-        <!-- <button id="runButton" onclick="runButton()" disabled="disabled">Run</button> -->
+        <div id="Buttons">
+            <button id="startButton" onclick="startButton()">Start (Ctrl-F9)</button>
+            <button id="stepButton" onclick="stepButton()" disabled="disabled">Step (Ctrl-F10)</button>
+            <button id="editButton" onclick="editButton()">Edit</button>
+            <!-- <button id="runButton" onclick="runButton()" disabled="disabled">Run</button> -->
+        </div>​
+
+        <div id="CopyrightDiv">
+            <p id="Copyright">Copyright &copy; Fernando Pelliccioni 2016-2019. All Rights Reserved.</p>​
+        </div>​
     </div>
 
     <div id="ME">
+        <div id="MEW"></div>​
+        <div id="MEE"></div>​
     </div>​
     
     <div id="SE">
@@ -76,9 +98,17 @@ var it = find_if_unguarded(f, pred);
             var lines = [];
             var prevLine = "";
             var myInterpreter;
-            var iterators = {};
+            var iterators_int = {};
+            var iterators_gui = {};
             var data = [];
             var pred;
+
+
+            var stats_it_moves = 0;
+            var stats_it_cmps = 0;
+            var stats_pred_appls = 0;
+            var stats_swaps = 0;
+            var stats_assigments = 0;
     
             // var two = new Two({
             //         fullscreen: false,
@@ -94,17 +124,43 @@ var it = find_if_unguarded(f, pred);
     
             // document.onkeypress = function (e) {
             //     e = e || window.event;
-            //     // console.log(e.keyCode)
-            //     // console.log(document.getElementById('stepButton').disabled);
-            //     if (e.keyCode == 13) {
-            //         if (document.getElementById('stepButton').disabled) {
-            //             startButton()
-            //         }
-            //         if ( ! document.getElementById('stepButton').disabled) {
-            //             stepButton();
-            //         }
-            //     }
+            //     console.log(e.keyCode)
+            //     // // console.log(document.getElementById('stepButton').disabled);
+            //     // if (e.keyCode == 13) {
+            //     //     if (document.getElementById('stepButton').disabled) {
+            //     //         startButton()
+            //     //     }
+            //     //     if ( ! document.getElementById('stepButton').disabled) {
+            //     //         stepButton();
+            //     //     }
+            //     // }
             // }
+
+
+            document.onkeydown = function (e) {
+                e = e || window.event;
+                    // console.log(e)
+                // console.log(e.keyCode)
+
+                if (e.ctrlKey && e.keyCode == 120) {
+                    if (document.getElementById('stepButton').disabled) {
+                        startButton()
+                    }
+                }
+
+                if (e.ctrlKey && e.keyCode == 121) {
+                    // if (document.getElementById('stepButton').disabled) {
+                    //     startButton()
+                    // }
+                    if ( ! document.getElementById('stepButton').disabled) {
+                        stepButton();
+                    }
+                }
+
+            };        
+
+
+
         </script>      
     
 
@@ -225,3 +281,33 @@ var f = begin(data, "f");
 var l = end(data, "l", "#d80500");
 var it = partition_bidirectional_optimized(f, l, pred);
                     </textarea> -->
+
+
+
+
+
+
+<!-- 
+
+                    <textarea id="dataCodeArea">
+                            data = [1, 3, 5];
+                            pred = function(x) {return x % 2 == 0;};
+                                    </textarea>
+                            
+                                    <textarea id="codeArea">
+                            function find_if_unguarded(f, p) {
+                                while ( ! p(source(f))) {
+                                    f = successor(f)
+                                }
+                                return f;
+                            }
+                            
+                            var f = begin(data, "f");
+                            var l = begin(data, "l");
+                            
+                            remove_it(l);
+                            
+                            var it = find_if_unguarded(f, pred);
+                            
+                            print(source(it))
+                                    </textarea>                     -->

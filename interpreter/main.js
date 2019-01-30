@@ -4,6 +4,36 @@ function Iterator(data, index, name) {
     this.name = name;
 }
 
+function updateState() {
+    var MEW = document.getElementById('MEW');
+    MEW.innerHTML = '';
+
+    for (var key in iterators_int) {
+        // console.log(iterators_int[key]);
+        var it = iterators_int[key];
+        var data = it.data;
+        var length = data.properties['length'];
+        var text = '<p id="Status">source(<b>' + key + '</b>) = ' + data.properties[it.index] + '</p>';
+        MEW.innerHTML += text;
+    }
+}
+
+function updateStats() {
+    var MEE = document.getElementById('MEE');
+    MEE.innerHTML = '';
+
+    MEE.innerHTML += '<p id="Status"><b>Iterator movements</b>: ' + stats_it_moves+ '</p>';
+    MEE.innerHTML += '<p id="Status"><b>Iterator comparisons</b>: ' + stats_it_cmps+ '</p>';
+    MEE.innerHTML += '<p id="Status"><b>Predicate applications</b>: ' + stats_pred_appls+ '</p>';
+    MEE.innerHTML += '<p id="Status"><b>Swaps</b>: ' + stats_swaps+ '</p>';
+    MEE.innerHTML += '<p id="Status"><b>Assignments</b>: ' + stats_assigments+ '</p>';
+}
+
+function updateStatus() {
+    updateState();
+    updateStats();
+}
+
 function initAlert(interpreter, scope) {
     var alert_wrapper = function(text) {
         return alert(arguments.length ? text : '');
@@ -12,16 +42,39 @@ function initAlert(interpreter, scope) {
     var print_wrapper = function(text) {
 
         var output = document.getElementById('output');
-        output.innerHTML = output.innerHTML + text + '<br />';
-        hljs.highlightBlock(output);
+        output.innerHTML += text;
+        // hljs.highlightBlock(output);
 
         console.log(arguments.length ? text : '');
     };
 
+    
+
+    var assign_it_wrapper = function(target, source) {
+
+        // console.log(target)
+        // console.log(source)
+        // console.log(iterators_gui[target.name])
+
+        target = new Iterator(target.data, source.index, target.name);
+        iterators_int[target.name] = target;
+
+        moveIteratorTo(two, iterators_gui[target.name], elements[target.index])
+
+        two.update();
+
+        //TODO: Iterator Assignment/Copy
+        // ++stats_it_moves;
+
+        updateStatus();
+        return target;
+    };
+
+
     var successor_wrapper = function(it, move = true) {
         var max = it.data.properties['length'];
 
-        console.log(it.index)
+        // console.log(it.index)
         if (it.index >= max) {
             print_wrapper('ERROR: out of range');
             disable('disabled');
@@ -29,13 +82,19 @@ function initAlert(interpreter, scope) {
         }
 
         if (move) {
-            moveIteratorTo(two, iterators[it.name], elements[it.index + 1])
+            moveIteratorTo(two, iterators_gui[it.name], elements[it.index + 1])
         }
-        return new Iterator(it.data, it.index + 1, it.name);
+        var it = new Iterator(it.data, it.index + 1, it.name);
+        iterators_int[it.name] = it;
+
+        ++stats_it_moves;
+
+        updateStatus();
+        return it;
     };
 
     var predecessor_wrapper = function(it, move = true) {
-        console.log(it.index)
+        // console.log(it.index)
         if (it.index <= 0) {
             print_wrapper('ERROR: out of range');
             disable('disabled');
@@ -43,17 +102,27 @@ function initAlert(interpreter, scope) {
         }
 
         if (move) {
-            moveIteratorTo(two, iterators[it.name], elements[it.index - 1])
+            moveIteratorTo(two, iterators_gui[it.name], elements[it.index - 1])
         }
-        return new Iterator(it.data, it.index - 1, it.name);
+        var it = new Iterator(it.data, it.index - 1, it.name);
+        iterators_int[it.name] = it;
+        ++stats_it_moves;
+
+        updateStatus();
+
+        return it;
     };
 
     var begin_wrapper = function(arr, name, color = '#000075') {
         var index = 0
         var it = new Iterator(arr, index, name);
         var it_gui = drawIterator(two, elements[index], name, color);
-        iterators[name] = it_gui;
+        iterators_gui[name] = it_gui;
+        iterators_int[name] = it;
         two.update();
+
+        updateStatus();
+
         return it;
     };
 
@@ -62,26 +131,35 @@ function initAlert(interpreter, scope) {
         var index = length
         var it = new Iterator(arr, index, name);
         var it_gui = drawIterator(two, elements[index], name, color);
-        iterators[name] = it_gui;
+        iterators_gui[name] = it_gui;
+        iterators_int[name] = it;
         two.update();
+
+        updateStatus();
+
         return it;
     };
 
     var source_wrapper = function(it) {
-
         var max = it.data.properties['length'];
         if (it.index >= max) {
-            print_wrapper('ERROR: not valid iterator to take the source');
+            // print_wrapper('ERROR: not valid iterator to take the source');
+            print_wrapper('<p><span style="color:red">ERROR: </span>not valid iterator to take the source.</p>');
+
             disable('disabled');
             return;
         }
-
-
         var s = it.data.properties[it.index];
+
+        ++stats_pred_appls;
+        updateStatus();
+
         return s;
     };
 
     var equal_wrapper = function(a, b) {
+        ++stats_it_cmps;
+        updateStatus();
         return a.index == b.index;
     };
 
@@ -89,16 +167,22 @@ function initAlert(interpreter, scope) {
         var index = it.index
         var it = new Iterator(it.data, it.index, name);
         var it_gui = drawIterator(two, elements[index], name, color);
-        iterators[name] = it_gui;
+        iterators_gui[name] = it_gui;
+        iterators_int[name] = it;
         two.update();
+
+        updateStatus();
+
         return it;
     };
 
     var remove_it_wrapper = function(it) {
-        // console.log(iterators[it.name]);
-        two.remove(iterators[it.name]);
+        // console.log(iterators_gui[it.name]);
+        two.remove(iterators_gui[it.name]);
         two.update();
-        delete iterators[it.name];
+        delete iterators_gui[it.name];
+        delete iterators_int[it.name];
+        updateStatus();
     };
 
 
@@ -132,6 +216,10 @@ function initAlert(interpreter, scope) {
         // console.log(elements[a.index].group.children[0])
         // console.log(elements[b.index].group.children[0])
 
+        ++stats_swaps;
+        stats_assigments += 3;
+
+        updateStatus();
         two.update();
     };
 
@@ -166,6 +254,7 @@ function initAlert(interpreter, scope) {
     interpreter.setProperty(scope, 'copy_it',     interpreter.createNativeFunction(copy_it_wrapper));
     interpreter.setProperty(scope, 'remove_it',   interpreter.createNativeFunction(remove_it_wrapper));
     interpreter.setProperty(scope, 'iter_swap',   interpreter.createNativeFunction(iter_swap_wrapper));
+    interpreter.setProperty(scope, 'assign_it',   interpreter.createNativeFunction(assign_it_wrapper));
 
     // interpreter.setProperty(scope, 'paint_data_pred',   interpreter.createNativeFunction(paint_data_pred_wrapper));
 }
@@ -184,7 +273,7 @@ function paint_data_pred(p) {
 
         // console.log(value)
         // console.log(elem)
-        // console.log(p)
+        console.log(p)
 
         if ( ! p(value)) {
             elem.rect.fill = '#ff9191';
@@ -201,6 +290,12 @@ function editButton() {
     document.getElementById('stepButton').style.display = "none";
     document.getElementById('editButton').style.display = "none";
 
+    var output = document.getElementById('output');
+    output.innerHTML = '';
+
+    var MEW = document.getElementById('MEW');
+    MEW.innerHTML = '';
+
     two.clear();
 }
 
@@ -213,7 +308,13 @@ function startButton() {
     document.getElementById('startButton').style.display = "none";
     document.getElementById('stepButton').style.display = "inline";
     document.getElementById('editButton').style.display = "inline";
-      
+
+    var output = document.getElementById('output');
+    output.innerHTML = '';
+
+    var MEW = document.getElementById('MEW');
+    MEW.innerHTML = '';
+
 
     // console.log(data)
     var yyy = eval(document.getElementById('dataCodeArea').value);
@@ -221,7 +322,9 @@ function startButton() {
     two.clear();
     elements = drawArray(two, data);
 
-    paint_data_pred(pred);
+    if (pred) {
+        paint_data_pred(pred);
+    } 
 
     var codeHighlight = document.getElementById('codeHighlight');
     codeHighlight.innerHTML = code;
@@ -236,7 +339,7 @@ function startButton() {
 
 function stepButton() {
     var codeHighlight = document.getElementById('codeHighlight');
-    console.log(codeHighlight.innerHTML)
+    // console.log(codeHighlight.innerHTML)
 
 
     while (true) {
@@ -339,7 +442,7 @@ function runButton() {
 
 function disable(disabled) {
     document.getElementById('stepButton').disabled = disabled;
-    document.getElementById('runButton').disabled = disabled;
+    // document.getElementById('runButton').disabled = disabled;
 }
 
 function createSelection(start, end) {
