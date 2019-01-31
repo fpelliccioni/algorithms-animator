@@ -1,3 +1,10 @@
+/*
+Copyright Fernando Pelliccioni 2019
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) 
+*/
+
 var leftMargin = 30;
 
 // var rectWidth = 80;
@@ -10,7 +17,6 @@ var fontSize = 50;
 var pointerFontSize = 40;
 
 var pointerTriangleSize = 5;
-
 
 function drawElement(two, x, y, text, color = '#bfffb3') {
     var rect = two.makeRectangle(x, y, rectWidth, rectHeight);
@@ -59,7 +65,8 @@ function drawPastLast(two, x, y) {
 
 }
 
-function drawIterator(two, elem, text, color = '#000075') {
+// function drawIterator(two, elem, text, color = '#000075') {
+function drawIterator(two, elem, text, color = '#99ff99') {
     var x = elem.rect.translation._x;
     var y = elem.rect.translation._y + elem.rect.height / 2 + 20;
 
