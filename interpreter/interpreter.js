@@ -321,6 +321,8 @@ Interpreter.prototype.initFunction = function(scope) {
   var identifierRegexp = /^[A-Za-z_$][\w$]*$/;
   // Function constructor.
   wrapper = function(var_args) {
+    console.log('fer2')
+    console.log(var_args)
     if (thisInterpreter.calledWithNew()) {
       // Called as new Function().
       var newFunc = this;
@@ -329,11 +331,13 @@ Interpreter.prototype.initFunction = function(scope) {
       var newFunc =
           thisInterpreter.createObjectProto(thisInterpreter.FUNCTION_PROTO);
     }
+    // console.log(arguments)
     if (arguments.length) {
       var code = String(arguments[arguments.length - 1]);
     } else {
       var code = '';
     }
+    // console.log(code)
     var argsStr = Array.prototype.slice.call(arguments, 0, -1).join(',').trim();
     if (argsStr) {
       var args = argsStr.split(/\s*,\s*/);
@@ -346,6 +350,7 @@ Interpreter.prototype.initFunction = function(scope) {
       }
       argsStr = args.join(', ');
     }
+    // console.log(argsStr)
     // Interestingly, the scope for constructed functions is the global scope,
     // even if they were constructed in some other scope.
     newFunc.parentScope = thisInterpreter.global;
@@ -370,7 +375,10 @@ Interpreter.prototype.initFunction = function(scope) {
     return newFunc;
   };
   wrapper.id = this.functionCounter_++;
+  // console.log('fer');
   this.FUNCTION = this.createObjectProto(this.FUNCTION_PROTO);
+  // console.log(this.FUNCTION);
+  // console.log(scope);
 
   this.setProperty(scope, 'Function', this.FUNCTION);
   // Manually setup type and prototype because createObj doesn't recognize
@@ -405,6 +413,7 @@ Interpreter.prototype.initFunction = function(scope) {
   };
 
   wrapper = function(thisArg, args) {
+    console.log('apply fer');
     var state =
         thisInterpreter.stateStack[thisInterpreter.stateStack.length - 1];
     // Rewrite the current 'CallExpression' to apply a different function.
@@ -424,8 +433,12 @@ Interpreter.prototype.initFunction = function(scope) {
     state.doneExec_ = false;
   };
   this.setNativeFunctionPrototype(this.FUNCTION, 'apply', wrapper);
+  console.log(this.FUNCTION);
+
 
   wrapper = function(thisArg /*, var_args */) {
+    console.log('call fer');
+
     var state =
         thisInterpreter.stateStack[thisInterpreter.stateStack.length - 1];
     // Rewrite the current 'CallExpression' to call a different function.
@@ -471,6 +484,7 @@ Interpreter.prototype.initFunction = function(scope) {
   // Function has no parent to inherit from, so it needs its own mandatory
   // toString and valueOf functions.
   wrapper = function() {
+    console.log('toString fer');
     return this.toString();
   };
   this.setNativeFunctionPrototype(this.FUNCTION, 'toString', wrapper);
@@ -2036,6 +2050,7 @@ Interpreter.prototype.hasProperty = function(obj, name) {
  */
 Interpreter.prototype.setProperty = function(obj, name, value, opt_descriptor) {
   name = String(name);
+  // console.log(name)
   if (obj === undefined || obj === null) {
     this.throwException(this.TYPE_ERROR,
                         "Cannot set property '" + name + "' of " + obj);

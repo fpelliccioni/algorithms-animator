@@ -161,8 +161,9 @@ function initAlert(interpreter, scope) {
         }
         var s = it.data.properties[it.index];
 
-        ++stats_pred_appls;
-        updateStatus();
+        //TODO
+        // ++stats_pred_appls;
+        // updateStatus();
 
         return s;
     };
@@ -252,32 +253,129 @@ function initAlert(interpreter, scope) {
     //         }
     //     }
     // }
+    
 
 
+    var add_sequence_wrapper = function(data_par, paint_pred) {
+        // console.log(data_par);
+        // console.log(data.node.id.name);
+        
 
-    interpreter.setProperty(scope, 'alert',       interpreter.createNativeFunction(alert_wrapper));
-    interpreter.setProperty(scope, 'print',       interpreter.createNativeFunction(print_wrapper));
-    interpreter.setProperty(scope, 'successor',   interpreter.createNativeFunction(successor_wrapper));
-    interpreter.setProperty(scope, 'predecessor', interpreter.createNativeFunction(predecessor_wrapper));
-    interpreter.setProperty(scope, 'begin',       interpreter.createNativeFunction(begin_wrapper));
-    interpreter.setProperty(scope, 'end',         interpreter.createNativeFunction(end_wrapper));
-    interpreter.setProperty(scope, 'source',      interpreter.createNativeFunction(source_wrapper));
-    interpreter.setProperty(scope, 'equal',       interpreter.createNativeFunction(equal_wrapper));
-    interpreter.setProperty(scope, 'copy_it',     interpreter.createNativeFunction(copy_it_wrapper));
-    interpreter.setProperty(scope, 'remove_it',   interpreter.createNativeFunction(remove_it_wrapper));
-    interpreter.setProperty(scope, 'iter_swap',   interpreter.createNativeFunction(iter_swap_wrapper));
-    interpreter.setProperty(scope, 'assign_it',   interpreter.createNativeFunction(assign_it_wrapper));
+        var data = [];
+        var length = data_par.properties['length'];
+
+        for (let i = 0; i < length; ++i) {
+            data.push(data_par.properties[i]);
+        }
+
+        console.log(data);
+
+        elements = drawArray(two, data);
+
+        // if (paint_it && predicates.length > 0) {
+        //     paint_data_pred(interpreter, predicates[0], data);
+        // } 
+        if (paint_pred) {
+            paint_data_pred(interpreter, paint_pred, data);
+        } 
+    
+        
+
+        updateStatus();
+        two.update();
+    };    
+
+
+    var set_predicate_wrapper = function(p) {
+       
+        console.log(p.node.id.name);
+        // interpreter.appendCode(p.node.id.name+'();');
+
+        predicates.push(p);
+        
+        updateStatus();
+        two.update();
+    };    
+
+    var increment_predicate_stats_wrapper = function(p, x) {
+        ++stats_pred_appls;
+        updateStatus();
+    };    
+
+
+    
+
+    var fill_elem_wrapper = function(i, c) {
+        // console.log(i);
+        // console.log(c);
+
+        let elem = elements[i];
+        elem.rect.fill = c;
+    };    
+
+    
+
+    interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
+    interpreter.setProperty(scope, 'print',          interpreter.createNativeFunction(print_wrapper));
+    interpreter.setProperty(scope, 'successor',      interpreter.createNativeFunction(successor_wrapper));
+    interpreter.setProperty(scope, 'predecessor',    interpreter.createNativeFunction(predecessor_wrapper));
+    interpreter.setProperty(scope, 'begin',          interpreter.createNativeFunction(begin_wrapper));
+    interpreter.setProperty(scope, 'end',            interpreter.createNativeFunction(end_wrapper));
+    interpreter.setProperty(scope, 'source',         interpreter.createNativeFunction(source_wrapper));
+    interpreter.setProperty(scope, 'equal',          interpreter.createNativeFunction(equal_wrapper));
+    interpreter.setProperty(scope, 'copy_it',        interpreter.createNativeFunction(copy_it_wrapper));
+    interpreter.setProperty(scope, 'remove_it',      interpreter.createNativeFunction(remove_it_wrapper));
+    interpreter.setProperty(scope, 'iter_swap',      interpreter.createNativeFunction(iter_swap_wrapper));
+    interpreter.setProperty(scope, 'assign_it',      interpreter.createNativeFunction(assign_it_wrapper));
+    interpreter.setProperty(scope, 'add_sequence',   interpreter.createNativeFunction(add_sequence_wrapper));
+    interpreter.setProperty(scope, 'set_predicate',  interpreter.createNativeFunction(set_predicate_wrapper));
+    interpreter.setProperty(scope, 'fill_elem',      interpreter.createNativeFunction(fill_elem_wrapper));
+    interpreter.setProperty(scope, 'increment_predicate_stats', interpreter.createNativeFunction(increment_predicate_stats_wrapper));
+    
+    
 
     // interpreter.setProperty(scope, 'paint_data_pred',   interpreter.createNativeFunction(paint_data_pred_wrapper));
 }
 
-function getAllCode() {
-    var dataCodeText = document.getElementById('dataCodeArea').value;
-    var codeText = document.getElementById('codeArea').value;
-    return dataCodeText + '\n' + codeText;
+
+
+function callPredCode() {
+    return 'function call_predicate(p, x){increment_predicate_stats(); return p(x);};\n';
 }
 
-function paint_data_pred(p) {
+function getAllCode() {
+    // var dataCodeText = document.getElementById('dataCodeArea').value;
+    // var codeText = document.getElementById('codeArea').value;
+    // return dataCodeText + '\n' + codeText;
+
+    return callPredCode() + document.getElementById('codeArea').value;
+}
+
+function getViewCode() {
+    // var dataCodeText = document.getElementById('dataCodeArea').value;
+    // var codeText = document.getElementById('codeArea').value;
+    // return dataCodeText + '\n' + codeText;
+
+    return document.getElementById('codeArea').value;
+}
+
+// function paint_data_pred(p) {
+
+//     for (let index = 0; index < elements.length - 1; ++index) {
+//         let value = data[index];
+//         let elem = elements[index];
+
+//         // console.log(value)
+//         // console.log(elem)
+//         console.log(p)
+
+//         if ( ! p(value)) {
+//             elem.rect.fill = '#ff9191';
+//         }
+//     }
+// }
+
+function paint_data_pred(interpreter, p, data) {
 
     for (let index = 0; index < elements.length - 1; ++index) {
         let value = data[index];
@@ -285,16 +383,21 @@ function paint_data_pred(p) {
 
         // console.log(value)
         // console.log(elem)
-        console.log(p)
+        // console.log(p)
+        // interpreter.appendCode(p.node.id.name+'();');
+        var code = 'if ( ! ' + p.node.id.name+'(' + value + ')) { fill_elem(' + index + ', "#ff9191"); }';
+        // console.log(code);
+        interpreter.appendCode(code);
 
-        if ( ! p(value)) {
-            elem.rect.fill = '#ff9191';
-        }
+        // if ( ! p(value)) {
+        //     elem.rect.fill = '#ff9191';
+        // }
     }
 }
 
+
 function editButton() {
-    document.getElementById('dataCodeArea').style.display = "inline";
+    // document.getElementById('dataCodeArea').style.display = "inline";
     document.getElementById('codeArea').style.display = "inline";
     document.getElementById('codeHighlightPre').style.display = "none";
 
@@ -312,8 +415,10 @@ function editButton() {
 }
 
 function startButton() {
-    var code = getAllCode();
-    document.getElementById('dataCodeArea').style.display = "none";
+    var codeAll = getAllCode();
+    var codeView = getViewCode();
+    
+    // document.getElementById('dataCodeArea').style.display = "none";
     document.getElementById('codeArea').style.display = "none";
     document.getElementById('codeHighlightPre').style.display = "block";
 
@@ -329,23 +434,23 @@ function startButton() {
 
 
     // console.log(data)
-    var yyy = eval(document.getElementById('dataCodeArea').value);
+    // var yyy = eval(document.getElementById('dataCodeArea').value);
     // console.log(data)
     two.clear();
-    elements = drawArray(two, data);
+    // elements = drawArray(two, data);
 
-    if (pred) {
-        paint_data_pred(pred);
-    } 
+    // if (pred) {
+    //     paint_data_pred(pred);
+    // } 
 
     var codeHighlight = document.getElementById('codeHighlight');
-    codeHighlight.innerHTML = code;
+    codeHighlight.innerHTML = codeView;
     hljs.highlightBlock(codeHighlight);
 
     var output = document.getElementById('output');
     hljs.highlightBlock(output);
 
-    myInterpreter = new Interpreter(code, initAlert);
+    myInterpreter = new Interpreter(codeAll, initAlert);
     disable('');
 }
 
@@ -368,7 +473,8 @@ function stepButton() {
         // createSelection(start, end);
 
 
-        var code = getAllCode();
+        var codeAll = getAllCode();
+        var codeView = getViewCode();
 
         try {
             var ok = myInterpreter.step();
@@ -378,19 +484,32 @@ function stepButton() {
                 // console.log('break 2')
 
                 var codeHighlight = document.getElementById('codeHighlight');
-                codeHighlight.innerHTML = code;
+                codeHighlight.innerHTML = codeView;
                 hljs.highlightBlock(codeHighlight);
         
                 break;
             }
         }
 
-        // var code = document.getElementById('codeArea').value;
-        var code = getAllCode();
-        var codeSelected = code.substring(start, end);
+        // console.log('-----------------------');
+        // console.log(start);
+        // console.log(end);
+
+        if (start < callPredCode().length) {
+            continue;
+        }
+
+        start -= callPredCode().length;
+        end -= callPredCode().length;
+
+        // console.log(start);
+        // console.log(end);
+        // console.log('-----------------------');
+
+        var codeSelected = codeView.substring(start, end);
         // console.log(codeSelected);
 
-        var codeHtml = [code.slice(0, end), "</mark>", code.slice(end)].join('');
+        var codeHtml = [codeView.slice(0, end), "</mark>", codeView.slice(end)].join('');
             codeHtml = [codeHtml.slice(0, start), "<mark>", codeHtml.slice(start)].join('');
         // console.log(codeHtml);
         var codeHighlight = document.getElementById('codeHighlight');

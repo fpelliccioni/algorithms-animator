@@ -42,15 +42,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
     }
     </script>     -->
 </head>
-
-
-
-
-
 <body>
-    <div class="main-container">
-        <div class="header-container">
-            <header>
+
+    <header>
+        <div>
             <h1 class="title-global">
                 <a href="/algorithms">Algorithms</a>
             </h1>
@@ -61,109 +56,92 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                     <li><a href="">[Help]</a></li>
                 </ul>
             </nav>
-            </header>
         </div>
-        <div class="hijo-grande">
-            <div class="hijo-grande-left">
-                <!-- <div class="hijo-grande-left-a">
-<textarea id="dataCodeArea">
-data = [3, 2, 7, 3, 2, 1, 5, 7];
-rel = function(x, y) { return x &lt; y; };
-</textarea>
-                </div> -->
-                <div class="hijo-grande-left-b">
-                    <pre id="codeHighlightPre"><code id="codeHighlight" class="javascript"></code></pre>
+    </header>
 
-<!-- <textarea id="codeArea">
-function min_element(f, l, r) {
+    <div id="main-content">
+            <h1>Some Heading</h1>
+            <p>Some Text</p>
+            <div>A div</div>
+    </div> <!-- end of main-content -->
 
-    if (equal(f, l)) return l;
+    <main>
+        <div id="full">
+            <div id="NW">
+            <!-- <pre id="codeHighlightPre"><code id="codeHighlight" class="javascript"></code></pre>
+            
+            <textarea id="dataCodeArea">
+    data = [3, 2, 7, 3, 2, 1, 5, 7];
+    rel = function(x, y) { return x &lt; y; };
+            </textarea>
 
-    //I m = f++;
-    var m = copy_it(f, 'm', '#9000d8');
-    f = successor(f);
+            <textarea id="codeArea">
+    function min_element(f, l, r) {
 
-    while ( ! equal(f, l)) {
-        if (r(source(f), source(m))) {
-            m = assign_it(m, f);
-        }
-        f = successor(f);
-    }
-    remove_it(m);
-    return m;
-}
-
-var rel = sequence(function(x, y) { return x &lt; y; });
-var data = sequence([3, 2, 7, 3, 2, 1, 5, 7]);
-
-var f = begin(data, "f");
-var l = end(data, "l", "#d80500");
-
-f = assign_it(f, min_element(f, l, rel));
-if ( ! equal(f, l)) {
-    print("The min element is: " + source(f));
-}
-</textarea> -->
-<textarea id="codeArea">
-function pred(x) { 
-    return x % 2 == 0; 
-}
-
-var data = [1, 2, 3, 4, 5, 6];
-
-//set_predicate(pred);
-add_sequence(data, pred);
-
-function find_if(f, l, p) {
-    while ( ! equal(f, l) && ! call_predicate(p, source(f))) {
-        f = successor(f)
-    }
-    return f;
-}
-
-
-var f = begin(data, "f");
-var l = end(data, "l", "#d80500");
-var it = find_if(f, l, pred);
-if ( ! equal(it, l)) {
-    print(source(it));
-}
-
-
-</textarea>                
-</div>
-                <div class="hijo-grande-left-c">
-                    <div id="Buttons">
-                        <button id="startButton" onclick="startButton()">Start (Ctrl-F9)</button>
-                        <button id="stepButton" onclick="stepButton()" disabled="disabled">Step (Ctrl-F10)</button>
-                        <button id="editButton" onclick="editButton()">Edit</button>
-                    </div>​
-                </div>
-
-                <div class="hijo-grande-left-d">
-                <!-- <div id="CopyrightDiv"> -->
-                    <p id="CopyrightP">
-                    <a id="Copyright" href="http://componentsprogramming.com/about-me/">Copyright &copy; Fernando Pelliccioni 2019.</a>
-                    </p>
-                <!-- </div>​ -->
-                </div>
+        if (equal(f, l)) return l;
     
-            </div>
-            <div class="hijo-grande-right">
-                <div class="hijo-grande-right-a">
-                    <div id="sequence"></div>
-                </div>
-                <div class="hijo-grande-right-b">
-                    <div id="MEW"></div>​
-                    <div id="MEE"></div>​
-                </div>
-                <div class="hijo-grande-right-c">
-                    <pre id="outputPre"><code id="output" class="javascript"></code></pre>                    
-                </div>
-            </div>
+        //I m = f++;
+        var m = copy_it(f, 'm', '#9000d8');
+        f = successor(f);
+
+        while ( ! equal(f, l)) {
+            if (r(source(f), source(m))) {
+                m = assign_it(m, f);
+            }
+            f = successor(f);
+        }
+        remove_it(m);
+        return m;
+    }
+
+    var f = begin(data, "f");
+    var l = end(data, "l", "#d80500");
+
+    f = assign_it(f, min_element(f, l, rel));
+    if ( ! equal(f, l)) {
+        print("The min element is: " + source(f));
+    }
+            </textarea>
+             -->
         </div>
-    </div>
-          
+
+        <div id="NE">
+            <!-- <div id="sequence"></div> -->
+        </div>
+        </div>
+        <!--
+        <div id="SW">
+            <div id="Buttons">
+                <button id="startButton" onclick="startButton()">Start (Ctrl-F9)</button>
+                <button id="stepButton" onclick="stepButton()" disabled="disabled">Step (Ctrl-F10)</button>
+                <button id="editButton" onclick="editButton()">Edit</button>
+            </div>​
+
+            <div id="CopyrightDiv">
+                <p id="CopyrightP"><a id="Copyright" href="http://componentsprogramming.com/about-me/">Copyright &copy; Fernando Pelliccioni 2019.</a></p>
+            </div>​
+        </div>
+
+        <div id="ME">
+            <div id="MEW"></div>​
+            <div id="MEE"></div>​
+        </div>​
+        
+        <div id="SE">
+            <pre id="outputPre"><code id="output" class="javascript"></code></pre>
+        </div>​ -->
+    <!-- </main> -->
+
+
+
+    <!-- <div id="TittleBar">
+            <h1 class="title-global">
+                <a id="tittle" href="/algorithms">Algorithms</a>
+            </h1>
+            <nav><ul><li><a href="/2018/about">[About]</a></li><li><a href="/2018/events">[Events]</a></li><li><a href="https://teespring.com/adventofcode" target="_blank">[Shop]</a></li><li><a href="/2018/settings">[Settings]</a></li><li><a href="/2018/auth/logout">[Log Out]</a></li></ul></nav>
+        </div> -->
+        
+
     <script>
             var elements;
             var lines = [];
@@ -173,9 +151,6 @@ if ( ! equal(it, l)) {
             var iterators_gui = {};
             var data = [];
             var pred;
-
-
-            var predicates = [];
 
 
             var stats_it_moves = 0;

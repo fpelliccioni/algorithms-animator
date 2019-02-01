@@ -1,0 +1,409 @@
+/*
+Copyright Fernando Pelliccioni 2019
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) 
+*/
+
+html, body { height:100%; margin:0; padding:0 }
+
+body {
+  background-color: #23241f;
+  /* background-color: #fff; */
+
+  
+
+  /* font-family: sans-serif; */
+
+  /* background: #0f0f23; */
+  /* color: #cccccc; */
+  font-family: "Source Code Pro", monospace;
+  font-size: 9pt;
+  /* min-width: 60em; */
+}
+
+header nav li {
+  display: inline-block;
+  padding: 0 .6em;
+}
+
+header nav a {
+  display: inline-block;
+  text-decoration: none;
+  outline: none;
+}
+
+#tittle {
+  display: inline-block;
+  text-decoration: none;
+  color: #00cc00;
+  text-shadow: 0 0 2px #00cc00, 0 0 5px #00cc00;
+
+  display: inline-block;
+  margin: 0;
+  padding-right: 1em;
+  /* font-size: 1em; */
+  font-size: 14pt;
+  font-weight: normal;
+
+  font-family: "Source Code Pro", monospace;
+  font-size: 14pt;
+  /* min-width: 60em;   */
+
+}
+
+header h1 {
+  display: inline-block;
+  margin: 0;
+  padding-right: 1em;
+}
+
+h1, h2 {
+  font-size: 1em;
+  font-weight: normal;
+}
+
+
+#NW { 
+  top:0;   
+  left:0;   
+  width:40%; 
+  height:90%;
+  background:#23241f;
+  position:fixed;
+}
+
+#SW { 
+  top:90%; 
+  left:0;  
+  width:40%; 
+  height:10%;
+  /* background:#009900; */
+  background: #23241f;
+  position:fixed;   
+  border-top: 1px solid #009900;
+  margin:0; padding:0;
+}
+
+#Buttons { 
+    height:60%;
+    /* background:pink; */
+    top: 0%;
+    margin:0; padding:0;
+    position: relative;
+}
+
+#CopyrightDiv {
+    /* height:20%; */
+    /* background:orange; */
+    bottom: 0%;
+    margin:0; padding:0;
+    position: relative;
+}
+
+#TittleBar { 
+  top:0;   
+  left:40%; 
+  width:60%; 
+  height: 10%;
+  background: #23241f;
+  border-left: 1px solid #009900;
+  position:fixed;
+}
+
+#NE { 
+  top: 10%;   
+  left:40%; 
+  width:60%; 
+  height: 32%;
+  background: #23241f;
+  border-left: 1px solid #009900;
+  border-top: 1px solid #009900;
+  position:fixed;
+}
+
+#ME { 
+  top: 42%;   
+  left:40%; 
+  width:60%; 
+  height: 40%;
+  background: #23241f;
+  position:fixed;
+  border-left: 1px solid #009900;
+  border-top: 1px solid #009900;
+  /* text-align:center; */
+}
+
+#SE { 
+  top: 82%; 
+  left:40%; 
+  width:60%; 
+  height: 18%;
+  background:#23241f;
+  position:fixed;
+  border-left: 1px solid #009900;
+  border-top: 1px solid #009900;
+} 
+
+#MEW { 
+    /* top:0%;    */
+    /* left:0%;  */
+    width:50%; 
+    height:100%;
+    background: #23241f;
+    /* background: pink; */
+    /* position: relative; */
+    float: left;
+    /* border-left: 1px solid #009900; */
+    /* border-top: 1px solid #009900; */
+    /* display: inline; */
+    /* text-align:left; */
+  }
+
+#MEE { 
+    /* top:0%;    */
+    /* left:50%;  */
+    width:50%; 
+    height:100%;
+    background: #23241f;
+    /* background: orange; */
+    /* position:relative; */
+    float: right;
+    /* border-left: 1px solid #009900; */
+    /* border-top: 1px solid #009900; */
+    /* display:inline; */
+}
+
+
+
+
+
+h1, h2, h3 {
+  font-weight: normal;
+}
+
+p {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12pt;
+    margin:0; 
+    padding:0;
+}
+
+a {
+  font-family: "Source Code Pro", monospace;
+  font-size: 8pt;
+  margin:0; 
+  padding:0;
+  color: #009900;
+  text-align: center;
+}
+
+a:hover {
+  color: #99ff99;
+}
+
+
+/* #Copyright {
+    font-family: "Source Code Pro", monospace;
+    font-size: 8pt;
+    margin:0; 
+    padding:0;
+    color: #009900;
+    text-align: center;
+}
+
+#Copyright:hover {
+  color: #99ff99;
+} */
+
+
+#CopyrightP {
+  font-family: "Source Code Pro", monospace;
+  font-size: 8pt;
+  margin:0; 
+  padding:0;
+  /* color: #009900; */
+  text-align: center;
+}
+
+#Status {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12pt;
+    margin:0; 
+    padding:0;
+    color: #009900;
+    /* text-align: center; */
+}
+
+
+#sequence {
+  width: 100%;
+  height:100%;
+  background: #23241f;
+  /* float:right; */
+  /* width: 80%; */
+} 
+
+#outputPre {
+  /* float:left; */
+  /* display: none; */
+  margin:0; 
+  padding:0;
+  width: 100%;
+  height:100%;
+}
+
+#output {
+  /* float:left; */
+  width: 100%;
+  height: 100%;
+  background-color: #23241f;
+  margin:0; 
+  padding:0;
+}
+
+#dataCodeArea {
+  font-family: monospace;
+  font-size: larger;
+  /* height: 3em; */
+  height: 10%;
+  width: 100%;
+  max-width: 111ex;
+  background-color: #23241f;
+  color: white;
+  /* color: #009900; */
+
+  border: none;
+  resize: none;
+}
+
+#dataCodeArea:focus {
+    outline: none !important;
+    /* border:1px solid red; */
+    /* box-shadow: 0 0 10px #719ECE; */
+    border: none;
+    box-shadow: none;
+}
+
+
+#codeArea {
+  /* float:left; */
+  font-family: monospace;
+  font-size: larger;
+  /* height: 50em; */
+  height: 90%;
+  width: 100%;
+  max-width: 111ex;
+  background-color: #23241f;
+  color: white;
+  /* color: #009900; */
+  border-top: 1px dotted #009900;
+  /* border-left: none; */
+  /* border-right: none; */
+  border: none;
+  /* border-style: dotted; */
+
+  background-image: linear-gradient(to right, #009900 22%, #23241f 0%);
+  background-position: top;
+  background-size: 3px 1px;
+  background-repeat: repeat-x;
+
+  margin-top: 1em;
+
+  /* border: none; */
+  resize: none;
+}
+
+#codeArea:focus {
+    outline: none !important;
+    /* border:1px solid red; */
+    /* box-shadow: 0 0 10px #719ECE; */
+    border: none;
+    box-shadow: none;
+}
+
+#codeHighlightPre {
+  /* float:left; */
+
+  display: none;
+  margin:0; 
+  padding:0;
+  width: 100%;
+  height:100%;
+}
+
+#codeHighlight {
+  /* float:left; */
+  margin:0; 
+  padding:0;
+  width: 100%;
+  height:100%;
+}
+
+/* hr {
+  /* color: #009900; */
+  /* background-color: #009900; */
+/* } */ 
+
+hr {
+  /* border-top: 1px solid red; */
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #009900;
+  margin: 0em 0;
+  padding: 0; 
+}
+
+button {
+  border: 0;
+  background: none;
+  /* box-shadow: none; */
+  border-radius: 0px;
+  /* color: #bfffb3; */
+  /* background-color: cornflowerblue; */
+  /* height: 3em; */
+  /* width: 10em; */
+
+  /* text-decoration: none; */
+  /* text-decoration: underline; */
+  color: #009900;
+  outline: 0;
+
+  font-family: "Source Code Pro", monospace;
+  font-size: 14pt;
+
+}
+
+button:hover { 
+  /* background-color: yellow; */
+  color: #99ff99;
+}
+
+#stepButton {
+  display: none;
+}
+
+#editButton {
+  display: none;
+}
+
+/* #stepButton {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0px;
+  background-color: cornflowerblue;
+  height: 3em;
+  width: 10em;
+}
+
+#runButton {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0px;
+  background-color: cornflowerblue;
+  height: 3em;
+  width: 10em;
+} */

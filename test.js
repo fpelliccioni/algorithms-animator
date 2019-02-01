@@ -33,7 +33,8 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
     // text.family = "DejaVu Sans Mono"
     // text.family = "Consolas"
     // text.family = "Lucida Console"
-    text.family = "Courier"
+    // text.family = "Courier"
+    text.family = "Source Code Pro";
 
     text.size = fontSize
     text.alignment = 'center'
@@ -81,7 +82,8 @@ function drawIterator(two, elem, text, color = '#99ff99') {
     // text.family = "DejaVu Sans Mono"
     // text.family = "Consolas"
     // text.family = "Lucida Console"
-    text.family = "Courier"
+    // text.family = "Courier"
+    text.family = "Source Code Pro";
     
     text.size = pointerFontSize //80
     text.alignment = 'center'
