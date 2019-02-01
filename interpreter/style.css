@@ -175,7 +175,8 @@ input[type="text"], textarea {
   background: transparent;
   color: inherit;
   border: 1px solid #666666;
-  background: #10101a;
+  /* background: #10101a; */
+  background: #0f0f23;
   padding: 0 2px;
   font-family: inherit;
   font-size: inherit;
@@ -546,7 +547,7 @@ form#settings input[type="checkbox"] ~ span {
 
 
 .hijo-grande-right {
-  background: green;
+  /* background: green; */
   flex: auto;
 
   display: flex;
@@ -554,18 +555,18 @@ form#settings input[type="checkbox"] ~ span {
 }
 
 .hijo-grande-right-a {
-  background: pink;
+  background: #0f0f23;
   height: 40%;
 }
 
 .hijo-grande-right-b {
-  background: orange;
+  /* background: orange; */
   flex: auto;
   display: flex;
 }
 
 .hijo-grande-right-c {
-  background: lightblue;
+  /* background: lightblue; */
   height: 30%;
   /* margin-bottom: 1em; */
 }
@@ -707,9 +708,90 @@ button:hover {
   background: #0f0f23;
 }
 
+
+
+
+
+
+
+#MEW { 
+    /* top:0%;    */
+    /* left:0%;  */
+    width:50%; 
+    height:100%;
+    /* background: #23241f; */
+    /* background: pink; */
+    /* position: relative; */
+    float: left;
+    /* border-left: 1px solid #009900; */
+    /* border-top: 1px solid #009900; */
+    /* display: inline; */
+    /* text-align:left; */
+  }
+
+#MEE { 
+    /* top:0%;    */
+    /* left:50%;  */
+    width:50%; 
+    height:100%;
+    /* background: #23241f; */
+    /* background: orange; */
+    /* position:relative; */
+    float: right;
+    /* border-left: 1px solid #009900; */
+    /* border-top: 1px solid #009900; */
+    /* display:inline; */
+}
+
+
+
+#outputPre {
+    /* float:left; */
+    /* display: none; */
+    margin:0; 
+    padding:0;
+    width: 100%;
+    height:100%;
+  }
+  
+  #output {
+    /* float:left; */
+    width: 100%;
+    height: 100%;
+    /* background-color: #23241f; */
+    margin:0; 
+    padding:0;
+
+    font-family: "Source Code Pro", monospace;
+    font-size: 10pt;
+    background: #0f0f23;
+  
+}
+  
+
+p {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12pt;
+    margin:0; 
+    padding:0;
+}
+
+
+
+
+
+
+
 /* mark {
   background-color: #99ff99;
 } */
+
+
+
+
+
+
+
 
 /* 
 Martín Aimar [5:23 PM]

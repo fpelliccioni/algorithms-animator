@@ -18,9 +18,14 @@ function updateState() {
     for (var key in iterators_int) {
         // console.log(iterators_int[key]);
         var it = iterators_int[key];
-        var data = it.data;
-        var length = data.properties['length'];
-        var text = '<p id="Status">source(<b>' + key + '</b>) = ' + data.properties[it.index] + '</p>';
+        var data = it.data.data;
+        // console.log(data)
+        // var length = data.properties['length'];
+        // var text = '<p id="Status">source(<b>' + key + '</b>) = ' + data.properties[it.index] + '</p>';
+ 
+        var length = data.length;
+        var text = '<p id="Status">source(<b>' + key + '</b>) = ' + data[it.index] + '</p>';
+
         MEW.innerHTML += text;
     }
 }
@@ -46,10 +51,22 @@ function initAlert(interpreter, scope) {
         return alert(arguments.length ? text : '');
     };
 
-    var print_wrapper = function(text) {
+    var error = function(text) {
+        var msg = '<p><span style="color:red">ERROR: </span>' + text + '</p>';
 
         var output = document.getElementById('output');
-        output.innerHTML += text;
+        output.innerHTML += msg;
+        // hljs.highlightBlock(output);
+
+        console.log(arguments.length ? text : '');
+
+    }
+
+    var print_wrapper = function(text) {
+        var msg = '<p><span style="color:cyan">INFO: </span>' + text + '</p>';
+
+        var output = document.getElementById('output');
+        output.innerHTML += msg;
         // hljs.highlightBlock(output);
 
         console.log(arguments.length ? text : '');
@@ -79,17 +96,18 @@ function initAlert(interpreter, scope) {
 
 
     var successor_wrapper = function(it, move = true) {
-        var max = it.data.properties['length'];
+        var data = it.data.data;
+        var max = data.length;
 
         // console.log(it.index)
         if (it.index >= max) {
-            print_wrapper('ERROR: out of range');
+            error('out of range');
             disable('disabled');
             return;
         }
 
         if (move) {
-            moveIteratorTo(two, iterators_gui[it.name], elements[it.index + 1])
+            moveIteratorTo(two, iterators_gui[it.name], it.data.elements[it.index + 1])
         }
         var it = new Iterator(it.data, it.index + 1, it.name);
         iterators_int[it.name] = it;
@@ -103,13 +121,13 @@ function initAlert(interpreter, scope) {
     var predecessor_wrapper = function(it, move = true) {
         // console.log(it.index)
         if (it.index <= 0) {
-            print_wrapper('ERROR: out of range');
+            error('out of range');
             disable('disabled');
             return;
         }
 
         if (move) {
-            moveIteratorTo(two, iterators_gui[it.name], elements[it.index - 1])
+            moveIteratorTo(two, iterators_gui[it.name], it.data.elements[it.index - 1])
         }
         var it = new Iterator(it.data, it.index - 1, it.name);
         iterators_int[it.name] = it;
@@ -122,10 +140,18 @@ function initAlert(interpreter, scope) {
 
     
     // var begin_wrapper = function(arr, name, color = '#000075') {
-    var begin_wrapper = function(arr, name, color = '#99ff99') {
+    // var begin_wrapper = function(arr, name, color = '#99ff99') {
+    var begin_wrapper = function(arr, name, color) {
+        console.log(arr)
+
+        if ( ! color) {
+            console.log(Object.keys(iterators_int).length)
+            color = iterators_colors[Object.keys(iterators_int).length];
+        }
+        
         var index = 0
         var it = new Iterator(arr, index, name);
-        var it_gui = drawIterator(two, elements[index], name, color);
+        var it_gui = drawIterator(two, arr.elements[index], name, color);
         iterators_gui[name] = it_gui;
         iterators_int[name] = it;
         two.update();
@@ -136,11 +162,18 @@ function initAlert(interpreter, scope) {
     };
 
     // var end_wrapper = function(arr, name, color = '#000075') {
-    var end_wrapper = function(arr, name, color = '#99ff99') {
-        var length = arr.properties['length']
+    // var end_wrapper = function(arr, name, color = '#99ff99') {
+    var end_wrapper = function(arr, name, color) {
+
+        if ( ! color) {
+            console.log(Object.keys(iterators_int).length)
+            color = iterators_colors[Object.keys(iterators_int).length];
+        }
+
+        var length = arr.data.length
         var index = length
         var it = new Iterator(arr, index, name);
-        var it_gui = drawIterator(two, elements[index], name, color);
+        var it_gui = drawIterator(two, arr.elements[index], name, color);
         iterators_gui[name] = it_gui;
         iterators_int[name] = it;
         two.update();
@@ -151,15 +184,15 @@ function initAlert(interpreter, scope) {
     };
 
     var source_wrapper = function(it) {
-        var max = it.data.properties['length'];
+        var data = it.data.data;
+        var max = data.length;
         if (it.index >= max) {
-            // print_wrapper('ERROR: not valid iterator to take the source');
-            print_wrapper('<p><span style="color:red">ERROR: </span>not valid iterator to take the source.</p>');
+            error('not valid iterator to take the source.');
 
             disable('disabled');
             return;
         }
-        var s = it.data.properties[it.index];
+        var s = data[it.index];
 
         //TODO
         // ++stats_pred_appls;
@@ -179,7 +212,7 @@ function initAlert(interpreter, scope) {
     var copy_it_wrapper = function(it, name, color = '#99ff99') {
         var index = it.index
         var it = new Iterator(it.data, it.index, name);
-        var it_gui = drawIterator(two, elements[index], name, color);
+        var it_gui = drawIterator(two, it.data.elements[index], name, color);
         iterators_gui[name] = it_gui;
         iterators_int[name] = it;
         two.update();
@@ -201,18 +234,12 @@ function initAlert(interpreter, scope) {
 
     var iter_swap_wrapper = function(a, b) {
         var data = a.data;
+        var elements = a.data.elements;
 
         var tmp_fill = elements[a.index].group.children[0].fill;
         elements[a.index].group.children[0].fill = elements[b.index].group.children[0].fill;
         elements[b.index].group.children[0].fill = tmp_fill;
 
-        // console.log(elements[a.index].group.children[0])
-        // console.log(elements[b.index].group.children[0])
-
-        // console.log(source_wrapper(a))
-        // console.log(source_wrapper(b))
-        
-        // console.log(data)
         var tmp = source_wrapper(a);
         // data[a.index] = source_wrapper(b);
         data.properties[a.index] = source_wrapper(b);
@@ -224,11 +251,6 @@ function initAlert(interpreter, scope) {
         // console.log(data)
 
 
-
-
-        // console.log(elements[a.index].group.children[0])
-        // console.log(elements[b.index].group.children[0])
-
         ++stats_swaps;
         stats_assigments += 3;
 
@@ -236,30 +258,14 @@ function initAlert(interpreter, scope) {
         two.update();
     };
 
-    // var paint_data_pred_wrapper = function(p) {
 
-    //     for (let index = 0; index < elements.length - 1; ++index) {
-    //         let value = data[index];
-    //         let elem = elements[index];
-
-    //         console.log(value)
-    //         console.log(elem)
-    //         console.log(p)
-
-            
-
-    //         if ( ! p(value)) {
-    //             elem.rect.fill = '#ff9191';
-    //         }
-    //     }
-    // }
-    
-
-
-    var add_sequence_wrapper = function(data_par, paint_pred) {
+    var add_sequence_internal_wrapper = function(data_par, name, paint_pred) {
         // console.log(data_par);
-        // console.log(data.node.id.name);
-        
+
+        if (sequences[name] != undefined) {
+            error('sequence "' + name + '" already exists.');
+            return null;
+        }
 
         var data = [];
         var length = data_par.properties['length'];
@@ -268,27 +274,29 @@ function initAlert(interpreter, scope) {
             data.push(data_par.properties[i]);
         }
 
-        console.log(data);
+        // console.log(data);
+        // elements = drawArray(two, data, name);
+        var elems = drawArray(two, data, name, Object.keys(sequences).length);
 
-        elements = drawArray(two, data);
-
-        // if (paint_it && predicates.length > 0) {
-        //     paint_data_pred(interpreter, predicates[0], data);
-        // } 
-        if (paint_pred) {
-            paint_data_pred(interpreter, paint_pred, data);
-        } 
-    
         
+
+        var retobj = {
+            name: name,
+            data: data,
+            elements: elems
+        };
+
+        sequences[name] = retobj;
 
         updateStatus();
         two.update();
+        return retobj;
     };    
 
 
     var set_predicate_wrapper = function(p) {
        
-        console.log(p.node.id.name);
+        // console.log(p.node.id.name);
         // interpreter.appendCode(p.node.id.name+'();');
 
         predicates.push(p);
@@ -302,18 +310,10 @@ function initAlert(interpreter, scope) {
         updateStatus();
     };    
 
-
-    
-
     var fill_elem_wrapper = function(i, c) {
-        // console.log(i);
-        // console.log(c);
-
         let elem = elements[i];
         elem.rect.fill = c;
     };    
-
-    
 
     interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
     interpreter.setProperty(scope, 'print',          interpreter.createNativeFunction(print_wrapper));
@@ -327,14 +327,10 @@ function initAlert(interpreter, scope) {
     interpreter.setProperty(scope, 'remove_it',      interpreter.createNativeFunction(remove_it_wrapper));
     interpreter.setProperty(scope, 'iter_swap',      interpreter.createNativeFunction(iter_swap_wrapper));
     interpreter.setProperty(scope, 'assign_it',      interpreter.createNativeFunction(assign_it_wrapper));
-    interpreter.setProperty(scope, 'add_sequence',   interpreter.createNativeFunction(add_sequence_wrapper));
+    interpreter.setProperty(scope, 'add_sequence_internal',   interpreter.createNativeFunction(add_sequence_internal_wrapper));
     interpreter.setProperty(scope, 'set_predicate',  interpreter.createNativeFunction(set_predicate_wrapper));
     interpreter.setProperty(scope, 'fill_elem',      interpreter.createNativeFunction(fill_elem_wrapper));
     interpreter.setProperty(scope, 'increment_predicate_stats', interpreter.createNativeFunction(increment_predicate_stats_wrapper));
-    
-    
-
-    // interpreter.setProperty(scope, 'paint_data_pred',   interpreter.createNativeFunction(paint_data_pred_wrapper));
 }
 
 
@@ -343,12 +339,33 @@ function callPredCode() {
     return 'function call_predicate(p, x){increment_predicate_stats(); return p(x);};\n';
 }
 
+function addSequenceCode() {
+    return 'function add_sequence(d, n, p) {' + '\n' +
+    '    var obj = add_sequence_internal(d, n, p);' + '\n' +
+    '    if ( ! obj) return obj;' + '\n' +
+    '    if (p) {' + '\n' +    
+    '        for (var i = 0; i < data.length; ++i) {' + '\n' +
+    '            var value = data[i];' + '\n' +
+    '            if ( ! p(value)) {' + '\n' +
+    '                fill_elem(i, "#ff9191");' + '\n' +
+    '            }' + '\n' +
+    '        }' + '\n' +
+    '    }' + '\n' +
+    '    return obj;' + '\n' +
+    '}'+ '\n'
+}
+
+function invisibleCode() {
+    return callPredCode() + addSequenceCode();
+}
+
+
 function getAllCode() {
     // var dataCodeText = document.getElementById('dataCodeArea').value;
     // var codeText = document.getElementById('codeArea').value;
     // return dataCodeText + '\n' + codeText;
 
-    return callPredCode() + document.getElementById('codeArea').value;
+    return invisibleCode() + document.getElementById('codeArea').value;
 }
 
 function getViewCode() {
@@ -359,7 +376,8 @@ function getViewCode() {
     return document.getElementById('codeArea').value;
 }
 
-// function paint_data_pred(p) {
+
+// function paint_data_pred(interpreter, p, data) {
 
 //     for (let index = 0; index < elements.length - 1; ++index) {
 //         let value = data[index];
@@ -367,33 +385,17 @@ function getViewCode() {
 
 //         // console.log(value)
 //         // console.log(elem)
-//         console.log(p)
+//         // console.log(p)
+//         // interpreter.appendCode(p.node.id.name+'();');
+//         var code = 'if ( ! ' + p.node.id.name+'(' + value + ')) { fill_elem(' + index + ', "#ff9191"); }';
+//         // console.log(code);
+//         interpreter.appendCode(code);
 
-//         if ( ! p(value)) {
-//             elem.rect.fill = '#ff9191';
-//         }
+//         // if ( ! p(value)) {
+//         //     elem.rect.fill = '#ff9191';
+//         // }
 //     }
 // }
-
-function paint_data_pred(interpreter, p, data) {
-
-    for (let index = 0; index < elements.length - 1; ++index) {
-        let value = data[index];
-        let elem = elements[index];
-
-        // console.log(value)
-        // console.log(elem)
-        // console.log(p)
-        // interpreter.appendCode(p.node.id.name+'();');
-        var code = 'if ( ! ' + p.node.id.name+'(' + value + ')) { fill_elem(' + index + ', "#ff9191"); }';
-        // console.log(code);
-        interpreter.appendCode(code);
-
-        // if ( ! p(value)) {
-        //     elem.rect.fill = '#ff9191';
-        // }
-    }
-}
 
 
 function editButton() {
@@ -416,6 +418,7 @@ function editButton() {
 
 function startButton() {
     var codeAll = getAllCode();
+    // console.log(codeAll);
     var codeView = getViewCode();
     
     // document.getElementById('dataCodeArea').style.display = "none";
@@ -432,16 +435,7 @@ function startButton() {
     var MEW = document.getElementById('MEW');
     MEW.innerHTML = '';
 
-
-    // console.log(data)
-    // var yyy = eval(document.getElementById('dataCodeArea').value);
-    // console.log(data)
     two.clear();
-    // elements = drawArray(two, data);
-
-    // if (pred) {
-    //     paint_data_pred(pred);
-    // } 
 
     var codeHighlight = document.getElementById('codeHighlight');
     codeHighlight.innerHTML = codeView;
@@ -495,12 +489,12 @@ function stepButton() {
         // console.log(start);
         // console.log(end);
 
-        if (start < callPredCode().length) {
+        if (start < invisibleCode().length) {
             continue;
         }
 
-        start -= callPredCode().length;
-        end -= callPredCode().length;
+        start -= invisibleCode().length;
+        end -= invisibleCode().length;
 
         // console.log(start);
         // console.log(end);

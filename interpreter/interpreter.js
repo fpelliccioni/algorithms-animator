@@ -321,8 +321,8 @@ Interpreter.prototype.initFunction = function(scope) {
   var identifierRegexp = /^[A-Za-z_$][\w$]*$/;
   // Function constructor.
   wrapper = function(var_args) {
-    console.log('fer2')
-    console.log(var_args)
+    // console.log('fer2')
+    // console.log(var_args)
     if (thisInterpreter.calledWithNew()) {
       // Called as new Function().
       var newFunc = this;
@@ -413,7 +413,7 @@ Interpreter.prototype.initFunction = function(scope) {
   };
 
   wrapper = function(thisArg, args) {
-    console.log('apply fer');
+    // console.log('apply fer');
     var state =
         thisInterpreter.stateStack[thisInterpreter.stateStack.length - 1];
     // Rewrite the current 'CallExpression' to apply a different function.
@@ -433,11 +433,11 @@ Interpreter.prototype.initFunction = function(scope) {
     state.doneExec_ = false;
   };
   this.setNativeFunctionPrototype(this.FUNCTION, 'apply', wrapper);
-  console.log(this.FUNCTION);
+//   console.log(this.FUNCTION);
 
 
   wrapper = function(thisArg /*, var_args */) {
-    console.log('call fer');
+    // console.log('call fer');
 
     var state =
         thisInterpreter.stateStack[thisInterpreter.stateStack.length - 1];
@@ -484,7 +484,7 @@ Interpreter.prototype.initFunction = function(scope) {
   // Function has no parent to inherit from, so it needs its own mandatory
   // toString and valueOf functions.
   wrapper = function() {
-    console.log('toString fer');
+    // console.log('toString fer');
     return this.toString();
   };
   this.setNativeFunctionPrototype(this.FUNCTION, 'toString', wrapper);
