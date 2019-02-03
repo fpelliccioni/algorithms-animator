@@ -92,7 +92,7 @@ function addLogSource(it, res) {
 }
 
 function addLogSink(it, x) {
-    addLog('source(' + it.data.name + '<sub>' + it.index + '</sub>, ' + x + ')');
+    addLog('sink(' + it.data.name + '<sub>' + it.index + '</sub>, ' + x + ')');
 }
 
 function addLogPredicate(name, x, res) {
