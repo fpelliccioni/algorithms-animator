@@ -5,7 +5,9 @@ Distributed under the Boost Software License, Version 1.0. (See accompanying
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) 
 -->
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
+<!-- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
 <html>
 <head>
     <meta charset="utf-8">
@@ -43,44 +45,34 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
     </script>     -->
 </head>
 
-
-
-
-
 <body>
     <div class="main-container">
         <div class="header-container">
             <header>
             <h1 class="title-global">
-                <a href="/algorithms">Algorithms</a>
+                <!-- <a href="/algorithms">Algorithms &#120572;</a>-->
+                <a href="http://componentsprogramming.com/algorithms">al-Khw&#257;rizm&#299; (&#120572;)</a>
             </h1>
             <nav>
                 <ul>
-                    <li><a href="http://componentsprogramming.com/about-me/">[About]</a></li>
-                    <li><a href="http://componentsprogramming.com/donate/">[Donate]</a></li>
-                    <li><a href="">[Help]</a></li>
+                    <li><a href="http://componentsprogramming.com/algorithms-about/">[About]</a></li>
+                    <li><a href="http://componentsprogramming.com/algorithms-support/">[Support]</a></li>
+                    <li><a href="http://componentsprogramming.com/">[Components Programming]</a></li>
+                    <!-- <li><a href="http://componentsprogramming.com/algorithms-help/">[Help]</a></li> -->
                 </ul>
             </nav>
             </header>
         </div>
-        <div class="hijo-grande">
-            <div class="hijo-grande-left">
-                <!-- <div class="hijo-grande-left-a">
-<textarea id="dataCodeArea">
-data = [3, 2, 7, 3, 2, 1, 5, 7];
-rel = function(x, y) { return x &lt; y; };
-</textarea>
-                </div> -->
-                <div class="hijo-grande-left-b">
+        <div class="hg">
+            <div class="hg-left">
+                <div class="hg-left-b">
                     <pre id="codeHighlightPre"><code id="codeHighlight" class="javascript"></code></pre>
 
 <!-- <textarea id="codeArea">
 function min_element(f, l, r) {
-
     if (equal(f, l)) return l;
 
-    //I m = f++;
-    var m = copy_it(f, 'm', '#9000d8');
+    var m = copy_it(f, 'm');
     f = successor(f);
 
     while ( ! equal(f, l)) {
@@ -93,18 +85,19 @@ function min_element(f, l, r) {
     return m;
 }
 
-var rel = sequence(function(x, y) { return x &lt; y; });
-var data = sequence([3, 2, 7, 3, 2, 1, 5, 7]);
+var rel = relation(function(x, y) { return x &lt; y; });
+var data = add_sequence([3, 2, 7, 3, 2, 1, 5, 7], "data");
 
 var f = begin(data, "f");
-var l = end(data, "l", "#d80500");
+var l = end(data, "l");
 
 f = assign_it(f, min_element(f, l, rel));
 if ( ! equal(f, l)) {
     print("The min element is: " + source(f));
 }
 </textarea> -->
-<textarea id="codeArea">
+
+<!-- <textarea id="codeArea">
 
 function find_if(f, l, p) {
     while ( ! equal(f, l) && ! call_predicate(p, source(f))) {
@@ -136,19 +129,66 @@ it = find_if(f2, l2, pred);
 if ( ! equal(it, l2)) {
     print(source(it));
 }
+</textarea>                 -->
 
+<textarea id="codeArea">
+function find_backward_if(f, l, p) {
+    while ( ! equal(l, f) && ! p(source(predecessor(l, false)))) {
+        l = predecessor(l);
+    }
+    return l;
+}
+        
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var data = add_sequence([1, 2, 3, 4, 5, 6, 3, 1, 7], "data");
+var f = begin(data, "f");
+var l = end(data, "l");
 
-</textarea>                
+var it = find_backward_if(f, l, even);
+if ( ! equal(it, f)) {
+    print(source(predecessor(it, false)));
+}
+</textarea>
+
+<!-- <textarea id="codeArea">
+function iota(f, l, start, step) {
+    if ( ! start) start = 0;
+    if ( ! step) step = 1;
+
+    while ( ! equal(f, l)) {
+        sink(f, start);
+        start += step;
+        f = successor(f);
+    }
+    return start;
+}
+
+var data1 = add_sequence(new Array(8), "data1");
+var data2 = add_sequence(new Array(5), "data2");
+
+var f = successor(begin(data1, "f"));
+var l = predecessor(end(data1, "l"));
+
+var r = iota(f, l);
+print(r);
+
+f = begin(data2, "f");
+l = end(data2, "l");
+r = iota(f, l, r);
+print(r);
+</textarea> -->
+    
 </div>
-                <div class="hijo-grande-left-c">
+                <div class="hg-left-c">
                     <div id="Buttons">
                         <button id="startButton" onclick="startButton()">Start (Ctrl-F9)</button>
                         <button id="stepButton" onclick="stepButton()" disabled="disabled">Step (Ctrl-F10)</button>
+                        <button id="restartButton" onclick="restartButton()">Restart</button>
                         <button id="editButton" onclick="editButton()">Edit</button>
                     </div>​
                 </div>
 
-                <div class="hijo-grande-left-d">
+                <div class="hg-left-d">
                 <!-- <div id="CopyrightDiv"> -->
                     <p id="CopyrightP">
                     <a id="Copyright" href="http://componentsprogramming.com/about-me/">Copyright &copy; Fernando Pelliccioni 2019.</a>
@@ -157,23 +197,40 @@ if ( ! equal(it, l2)) {
                 </div>
     
             </div>
-            <div class="hijo-grande-right">
-                <div class="hijo-grande-right-a">
-                    <div id="sequence"></div>
+
+            <div class="hg-right">
+                <div id="hg-right-a" class="hg-right-a">
+                    <div id="sequence"></div>                    
                 </div>
-                <div class="hijo-grande-right-b">
-                    <div id="MEW"></div>​
-                    <div id="MEE"></div>​
-                </div>
-                <div class="hijo-grande-right-c">
-                    <pre id="outputPre"><code id="output" class="javascript"></code></pre>                    
+                <div class="hg-right-b">
+                    <div id="hg-right-b-a">
+                        <div id="hg-right-x">
+                            <div id="hg-right-x-a"></div>
+                            <div id="hg-right-x-b"></div>
+                        </div>
+                        <div id="hg-right-y">
+                            <pre id="outputPre"><code id="output" class="javascript"></code></pre>                            
+                        </div>
+                    </div>
+                    <div id="hg-right-b-b"></div>
                 </div>
             </div>
+    
         </div>
     </div>
           
+                <!-- <div class="hg-right-a">
+                    <div id="sequence"></div>
+                </div>
+                <div class="hg-right-b">
+                    <div id="MEW"></div>​
+                    <div id="MEE"></div>​
+                </div>
+                <div class="hg-right-c">
+                    <pre id="outputPre"><code id="output" class="javascript"></code></pre>                    
+                </div> -->
+
     <script>
-            // var elements;
             var lines = [];
             var prevLine = "";
             var myInterpreter;
@@ -183,9 +240,6 @@ if ( ! equal(it, l2)) {
 
             var iterators_int = {};
             var iterators_gui = {};
-            // var data = [];
-            // var pred;
-
             var predicates = [];
             var sequences = {};
 
@@ -195,15 +249,15 @@ if ( ! equal(it, l2)) {
             var stats_swaps = 0;
             var stats_assigments = 0;
     
-            // var two = new Two({
-            //         fullscreen: false,
-            //         autostart: true
-            // });
-    
+            // console.log(document.getElementById('hg-right-a').offsetWidth)
+            // console.log(document.getElementById('hg-right-a').offsetHeight)
+
             var two = new Two({
                     fullscreen: false,
-                    width: document.getElementById('sequence').offsetWidth,
-                    height: 600,
+                    // width: document.getElementById('sequence').offsetWidth,
+                    // height: 600,
+                    width: document.getElementById('hg-right-a').offsetWidth,
+                    height: document.getElementById('hg-right-a').offsetHeight,
                     autostart: true
             }).appendTo(sequence);
     
@@ -220,6 +274,7 @@ if ( ! equal(it, l2)) {
             //     //     }
             //     // }
             // }
+
 
 
             document.onkeydown = function (e) {
@@ -246,6 +301,17 @@ if ( ! equal(it, l2)) {
 
 
 
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var c = url.searchParams.get("code");
+            // console.log(c);
+
+            if (c) {
+                document.getElementById('codeArea').value = c;
+            }
+
+            editButton();
+            
         </script>      
     
 

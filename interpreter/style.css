@@ -504,39 +504,40 @@ form#settings input[type="checkbox"] ~ span {
   /* margin-bottom: 1em; */
 }
 
-.hijo-grande {
+.hg {
   /* background: blue; */
   flex: auto;
   display: flex;
   flex-direction: row;
 }
 
-.hijo-grande-left {
+.hg-left {
   /* background: brown; */
   /* flex: auto; */
   width: 35%;
+  max-width: 35%;
 
   display: flex;
   flex-direction: column;
 }
 
-/* .hijo-grande-left-a {
+/* .hg-left-a {
   height: 80px;
 } */
 
-.hijo-grande-left-b {
+.hg-left-b {
   /* background: orange; */
   flex: auto;
   display: flex;
 }
 
-.hijo-grande-left-c {
+.hg-left-c {
   /* background: lightblue; */
   height: 30px;
   /* margin-bottom: 1em; */
 }
 
-.hijo-grande-left-d {
+.hg-left-d {
   /* background: lightcoral; */
   height: 40px;
   /* margin-bottom: 1em; */
@@ -546,30 +547,80 @@ form#settings input[type="checkbox"] ~ span {
 }
 
 
-.hijo-grande-right {
+.hg-right {
   /* background: green; */
   flex: auto;
 
   display: flex;
   flex-direction: column;
+
+  /* border-left: 1px dotted #009900; */
 }
 
-.hijo-grande-right-a {
-  background: #0f0f23;
-  height: 40%;
-}
-
-.hijo-grande-right-b {
-  /* background: orange; */
+.hg-right-a {
+  /* background: #0f0f23; */
+  /* height: 40%; */
   flex: auto;
-  display: flex;
+  /* background: pink; */
 }
 
-.hijo-grande-right-c {
-  /* background: lightblue; */
-  height: 30%;
-  /* margin-bottom: 1em; */
+.hg-right-b {
+  /* background: blue; */
+  /* border-top: 1px dotted #009900; */
+
+  height: 60%;
+  /* flex: auto; */
+  display: flex;
+  flex-direction: row;
 }
+
+#hg-right-b-a { 
+  width:66.6%;
+  /* width:30%; */ 
+  /* flex: auto; */
+  /* background: white; */
+
+  display: flex; 
+  flex-direction: column;
+}
+
+#hg-right-b-b { 
+  flex: auto;
+  /* background: red; */
+  /* border-left: 1px dotted #009900; */
+
+}
+
+#hg-right-x { 
+  /* background: orange; */
+  height: 50%;
+
+  display: flex; 
+  flex-direction: row;
+
+}
+
+#hg-right-x-a { 
+  /* background: blue; */
+  width: 60%;
+}
+
+#hg-right-x-b { 
+  /* background: pink; */
+  flex: auto;
+}
+
+
+#hg-right-y { 
+  /* background: brown; */
+  flex: auto;
+  /* border-top: 1px dotted #009900; */
+
+}
+
+
+
+
 
 /* #dataCodeArea {
   height: 100%;
@@ -694,7 +745,15 @@ button:hover {
   color: #99ff99;
 }
 
+#codeHighlightPre {
+  /* float:left; */
 
+  display: none;
+  margin:0; 
+  padding:0;
+  width: 100%;
+  height:100%;
+}
 
 #codeHighlight {
   /* float:left; */
@@ -702,46 +761,20 @@ button:hover {
   padding:0;
   width: 100%;
   height:100%;
+  max-width: 100%;
 
   font-family: "Source Code Pro", monospace;
   font-size: 10pt;
   background: #0f0f23;
+
+
+  /* -webkit-box-sizing: border-box; Safari/Chrome, other WebKit */
+  /* -moz-box-sizing: border-box;    Firefox, other Gecko */
+  /* box-sizing: border-box;         Opera/IE 8+ */
 }
 
 
 
-
-
-
-
-#MEW { 
-    /* top:0%;    */
-    /* left:0%;  */
-    width:50%; 
-    height:100%;
-    /* background: #23241f; */
-    /* background: pink; */
-    /* position: relative; */
-    float: left;
-    /* border-left: 1px solid #009900; */
-    /* border-top: 1px solid #009900; */
-    /* display: inline; */
-    /* text-align:left; */
-  }
-
-#MEE { 
-    /* top:0%;    */
-    /* left:50%;  */
-    width:50%; 
-    height:100%;
-    /* background: #23241f; */
-    /* background: orange; */
-    /* position:relative; */
-    float: right;
-    /* border-left: 1px solid #009900; */
-    /* border-top: 1px solid #009900; */
-    /* display:inline; */
-}
 
 
 
@@ -769,11 +802,28 @@ button:hover {
 }
   
 
-p {
+/* p {
     font-family: "Source Code Pro", monospace;
     font-size: 12pt;
     margin:0; 
     padding:0;
+} */
+
+
+#Status {
+  font-family: "Source Code Pro", monospace;
+  font-size: 10pt;
+  margin:0; 
+  padding:0;
+  color: #009900;
+  /* text-align: center; */
+}
+
+#OutputMsg {
+  font-family: "Source Code Pro", monospace;
+  font-size: 10pt;
+  margin:0; 
+  padding:0;
 }
 
 

@@ -1,0 +1,206 @@
+<!-- 
+Copyright Fernando Pelliccioni 2019
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) 
+-->
+
+<!-- <!DOCTYPE html> -->
+<!-- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+<head>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="header-container">
+            <header>
+            <h1 class="title-global">
+                <!-- <a href="/algorithms">Algorithms &#120572;</a>-->
+                <a href="http://componentsprogramming.com/algorithms">al-Khw&#257;rizm&#299; (&#120572;)</a>
+            </h1>
+            <nav>
+                <ul>
+                    <li><a href="http://componentsprogramming.com/algorithms-about/">[About]</a></li>
+                    <li><a href="http://componentsprogramming.com/algorithms-support/">[Support]</a></li>
+                    <!-- <li><a href="http://componentsprogramming.com/algorithms-help/">[Help]</a></li> -->
+                </ul>
+            </nav>
+            </header>
+        </div>
+        <div class="hg">
+            <div class="hg-left">
+                <div class="hg-left-b">
+                </div>
+                <div class="hg-left-c">
+                    <div id="Buttons">
+                    </div>​
+                </div>
+                <div class="hg-left-d">
+                </div>
+            </div>
+            <div class="hg-right">
+                <div class="hg-right-a">
+                </div>
+                <div class="hg-right-b">
+                    <div id="hg-right-b-b">
+                        <div id="hg-right-x"></div>​
+                        <div id="hg-right-y"></div>​
+                        <div id="hg-right-z"></div>​
+                    </div>​
+                    <div id="hg-right-b-a">
+                    </div>​
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+</html>
+
+
+
+<!-- 
+function partition_semistable(f, l, p) {
+    while (true) {
+        if (equal(f, l)) return f;
+        if (p(source(f))) break;
+        f = successor(f);
+    }
+
+    //var j = f; 
+    var j = copy_it(f, 'j', '#9000d8');
+    j = successor(j)
+
+    while ( ! equal(j, l)) {
+        if ( ! p(source(j))) {
+            iter_swap(f, j);
+            f = successor(f);
+        }
+        j = successor(j);
+    }
+
+    remove_it(j);   //GUI stuff
+
+    return f;
+}
+
+// var it = partition_semistable(f, l, function(x) {return x % 2 == 0;});
+
+// var it = find_if(f, l, function(x) {return x % 2 == 0;});
+//if ( ! equal(it, l)) {
+//    print(source(it));
+//}
+
+function find_backward_if(f, l, p) {
+    while ( ! equal(l, f) && ! p(source(predecessor(l, false)))) {
+        l = predecessor(l);
+    }
+    return l;
+}
+
+//var it = find_backward_if(f, l, function(x) {return x % 2 == 0;});
+//if ( ! equal(it, l)) {
+//    print(source(predecessor(it, false)));
+//}
+
+
+function find(f, l, x) {
+    while ( ! equal(f, l)) {
+        if (source(f) == x) {
+            return f;
+        }
+        f = successor(f)
+    }
+    return f;
+} -->
+
+
+        <!-- <p><textarea id="dataCodeArea">
+data = [1, 3, 5, 2, 4, 8, 7, 2, 1, 3, 5, 2, 7, 8, 4];
+pred = function(x) {return x % 2 == 0;};
+        </textarea></p> -->
+
+    <!-- <textarea id="code">
+function find_if(f, l, p) {
+    while ( ! equal(f, l) && ! p(source(f))) {
+        f = successor(f)
+    }
+    return f;
+}
+
+function find_backward_if_not(f, l, p) {
+    while ( ! equal(l, f) && p(source(predecessor(l, false)))) {
+        l = predecessor(l);
+    }
+    return l;
+}
+
+function partition_bidirectional_unguarded(f, l, p) {
+    while(true) {
+        while ( ! p(source(f))) {
+            f = successor(f)
+        }
+
+        l = predecessor(l);
+        while (p(source(l))) {
+            l = predecessor(l);
+        }
+
+        l = successor(l);
+        if ( equal(l, f)) return f;
+
+        l = predecessor(l);
+        iter_swap(f, l);
+        f = successor(f)
+    }
+}
+
+function partition_bidirectional_optimized(f, l, p) {
+    f = find_if(f, l, p);
+    l = find_backward_if_not(f, l, p);
+    if (equal(f, l)) return f;
+    l = predecessor(l);
+    iter_swap(f, l);
+    f = successor(f)
+    return partition_bidirectional_unguarded(f, l, p);
+
+}
+
+var f = begin(data, "f");
+var l = end(data, "l", "#d80500");
+var it = partition_bidirectional_optimized(f, l, pred);
+                    </textarea> -->
+
+
+
+
+
+
+<!-- 
+
+                    <textarea id="dataCodeArea">
+                            data = [1, 3, 5];
+                            pred = function(x) {return x % 2 == 0;};
+                                    </textarea>
+                            
+                                    <textarea id="codeArea">
+                            function find_if_unguarded(f, p) {
+                                while ( ! p(source(f))) {
+                                    f = successor(f)
+                                }
+                                return f;
+                            }
+                            
+                            var f = begin(data, "f");
+                            var l = begin(data, "l");
+                            
+                            remove_it(l);
+                            
+                            var it = find_if_unguarded(f, pred);
+                            
+                            print(source(it))
+                                    </textarea>                     -->

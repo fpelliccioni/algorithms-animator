@@ -6,7 +6,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 */
 
 var defaultLeftMargin = 10;
-var defaultTopMargin = 40;
+var defaultTopMargin = 0;
 var sequenceTotalHeight = 135;
 
 // var rectWidth = 80;
@@ -16,13 +16,20 @@ var sequenceTotalHeight = 135;
 var rectWidth = 40;
 var rectHeight = 60;
 var fontSize = 50;
+var indexFontSize = 15;
 var pointerFontSize = 40;
 var labelFontSize = 24;
 
 var pointerTriangleSize = 5;
 
-function drawElement(two, x, y, text, color = '#bfffb3') {
-    var rect = two.makeRectangle(x, y, rectWidth, rectHeight);
+function drawElement(two, x, y, text, index, color = '#bfffb3') {
+
+    var textIndex = two.makeText(index, x, y + 8);
+    textIndex.family = "Source Code Pro";
+    textIndex.size = indexFontSize
+    textIndex.fill = 'white';
+
+    var rect = two.makeRectangle(x, y + 45, rectWidth, rectHeight);
     rect.fill = color;
     rect.stroke = 'black'
     rect.linewidth = 1;
@@ -31,8 +38,7 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
     // console.log(rect.translation._x)
 
 
-    // var text = two.makeText(text, x, y + 15);
-    var text = two.makeText(text, x, y + 1.5);
+    var text = two.makeText(text, x, y + 45 + 1.5);
     // text.family = "DejaVu Sans Mono"
     // text.family = "Consolas"
     // text.family = "Lucida Console"
@@ -42,7 +48,9 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
     // text.alignment = 'center'
     // text.baseline = 'middle'
 
-    var group = two.makeGroup(rect, text);
+
+
+    var group = two.makeGroup(rect, text, textIndex);
     // console.log(group.x)
     // return group;
 
@@ -53,7 +61,7 @@ function drawElement(two, x, y, text, color = '#bfffb3') {
 }
 
 function drawPastLast(two, x, y) {
-    var rect = two.makeRectangle(x, y, rectWidth, rectHeight);
+    var rect = two.makeRectangle(x, y + 45, rectWidth, rectHeight);
     rect.fill = '#cacaca';
     rect.stroke = 'black'
     rect.linewidth = 1;
@@ -119,7 +127,7 @@ function drawArray(two, arr, name, id) {
 
     if (name) {
         name += ":"
-        var text = two.makeText(name, leftMargin, topMargin);
+        var text = two.makeText(name, leftMargin, topMargin + 45);
         text.family = "Source Code Pro";
         text.size = labelFontSize
         text.alignment = 'left'
@@ -129,7 +137,7 @@ function drawArray(two, arr, name, id) {
 
     for (let index = 0; index < arr.length; ++index) {
         let value = arr[index];
-        var e = drawElement(two,  leftMargin + rectWidth / 2 + index * rectWidth, topMargin, value);
+        var e = drawElement(two,  leftMargin + rectWidth / 2 + index * rectWidth, topMargin, value, index);
         elements.push(e)
         // console.log(value);
     }
