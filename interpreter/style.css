@@ -171,6 +171,24 @@ header nav a {
   outline: none;
 }
 
+
+main nav {
+  display: inline-block;
+}
+
+main nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+}
+
+main nav li {
+  display: inline-block;
+  padding: 0 .6em;
+}
+
+
 input[type="text"], textarea {
   background: transparent;
   color: inherit;
@@ -529,6 +547,8 @@ form#settings input[type="checkbox"] ~ span {
   /* background: orange; */
   flex: auto;
   display: flex;
+
+  overflow-y: scroll;
 }
 
 .hg-left-c {
@@ -589,6 +609,7 @@ form#settings input[type="checkbox"] ~ span {
   /* background: red; */
   /* border-left: 1px dotted #009900; */
 
+  overflow-y: scroll;
 }
 
 #hg-right-x { 
@@ -614,30 +635,16 @@ form#settings input[type="checkbox"] ~ span {
 #hg-right-y { 
   /* background: brown; */
   flex: auto;
+  flex-grow: unset;
   /* border-top: 1px dotted #009900; */
+
+  max-height: 50%;
+
+  overflow-x: scroll;
+  overflow-y: scroll;
 
 }
 
-
-
-
-
-/* #dataCodeArea {
-  height: 100%;
-  width: 100%;
-  max-width: 111ex;
-
-  font-size: 10pt;
-
-  border: none;
-  resize: none;
-  overflow: auto;
-  outline: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-
-} */
 
 #codeArea {
   /* float:left; */
@@ -753,6 +760,8 @@ button:hover {
   padding:0;
   width: 100%;
   height:100%;
+
+  overflow-y: scroll;
 }
 
 #codeHighlight {
@@ -767,6 +776,7 @@ button:hover {
   font-size: 10pt;
   background: #0f0f23;
 
+  overflow-y: scroll;
 
   /* -webkit-box-sizing: border-box; Safari/Chrome, other WebKit */
   /* -moz-box-sizing: border-box;    Firefox, other Gecko */
@@ -778,9 +788,7 @@ button:hover {
 
 
 
-#outputPre {
-    /* float:left; */
-    /* display: none; */
+/* #outputPre {
     margin:0; 
     padding:0;
     width: 100%;
@@ -788,18 +796,14 @@ button:hover {
   }
   
   #output {
-    /* float:left; */
     width: 100%;
     height: 100%;
-    /* background-color: #23241f; */
     margin:0; 
     padding:0;
-
     font-family: "Source Code Pro", monospace;
     font-size: 10pt;
     background: #0f0f23;
-  
-}
+} */
   
 
 /* p {

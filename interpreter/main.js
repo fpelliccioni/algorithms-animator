@@ -5,6 +5,230 @@ Distributed under the Boost Software License, Version 1.0. (See accompanying
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) 
 */
 
+var log_stats_enabled = true;
+
+var snippets = {
+find_if: 
+`function find_if(f, l, p) {
+    while ( ! equal(f, l) && ! p(source(f))) {
+        f = successor(f)
+    }
+    return f;
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d");
+var f = begin(d, "f");
+var l = end(d, "l");
+
+var it = find_if(f, l, even);
+if ( ! equal(it, l)) {
+    print(source(it));
+}
+`
+, find_backward_if: 
+`function find_backward_if(f, l, p) {
+    while (true) {
+        if (equal(l, f)) return f;
+        l = predecessor(l);
+        if (p(source(l))) return successor(l);
+    }    
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d");
+var f = begin(d, "f");
+var l = end(d, "l");
+
+var it = find_backward_if(f, l, even);
+if ( ! equal(it, f)) {
+    print(source(predecessor(it, false)));
+}
+`,min_element: 
+`function min_element(f, l, r) {
+    if (equal(f, l)) return l;
+
+    var m = copy_it(f, 'm');
+    f = successor(f);
+
+    while ( ! equal(f, l)) {
+        if (r(source(f), source(m))) {
+            m = assign_it(m, f);
+        }
+        f = successor(f);
+    }
+    remove_it(m);
+    return m;
+}
+
+var rel = relation(function(x, y) { return x < y; }, 'less');
+var d = add_sequence(random_array(), "d");
+
+var f = begin(d, "f");
+var l = end(d, "l");
+
+f = assign_it(f, min_element(f, l, rel));
+if ( ! equal(f, l)) {
+    print("The min element is: " + source(f));
+}
+`
+, iota: 
+`function iota(f, l, start, step) {
+    if ( ! start) start = 0;
+    if ( ! step) step = 1;
+
+    while ( ! equal(f, l)) {
+        sink(f, start);
+        start += step;
+        f = successor(f);
+    }
+    return start;
+}
+
+var d1 = add_sequence(new Array(8), "d1");
+var d2 = add_sequence(new Array(5), "d2");
+
+var f = successor(begin(d1, "f"));
+var l = predecessor(end(d1, "l"));
+
+var r = iota(f, l);
+print(r);
+
+f = begin(d2, "f");
+l = end(d2, "l");
+r = iota(f, l, r);
+print(r);`
+
+,partition_semistable_1:
+`//Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+//Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L40
+function find_if(f, l, p) {
+    while ( ! equal(f, l) && ! p(source(f))) {
+        f = successor(f)
+    }
+    return f;
+}
+
+function partition_semistable_1(f, l, p) {
+    f = find_if(f, l, p);
+    if (f == l) return f;
+
+    var j = copy_it(f, 'j');
+    j = successor(j)
+
+    while ( ! equal(j, l)) {
+        if ( ! p(source(j))) {
+            iter_swap(f, j);
+            f = successor(f);
+        }
+        j = successor(j);
+    }
+    remove_it(j);
+    return f;
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var f = begin(d, "f");
+var l = end(d, "l");
+
+var it = partition_semistable_1(f, l, even);
+if ( ! equal(it, l)) {
+    print('partition point: ' + source(it));
+}`
+
+,partition_semistable:
+`//Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+//Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L58
+function partition_semistable(f, l, p) {
+    while (true) {
+        if (equal(f, l)) return f;
+        if (p(source(f))) break;
+        f = successor(f);
+    }
+
+    var j = copy_it(f, 'j');
+    j = successor(j)
+
+    while ( ! equal(j, l)) {
+        if ( ! p(source(j))) {
+            iter_swap(f, j);
+            f = successor(f);
+        }
+        j = successor(j);
+    }
+    remove_it(j);
+    return f;
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var f = begin(d, "f");
+var l = end(d, "l");
+
+var it = partition_semistable(f, l, even);
+if ( ! equal(it, l)) {
+    print('partition point: ' + source(it));
+}`
+
+,partition_semistable_nonempty:
+`//Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+//Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L91
+function partition_semistable_nonempty(f, l, p) {
+    //precondition: nonempty: ! equal(f, l)
+    while ( ! p(source(f))) {
+        f = successor(f);
+        if (equal(f, l)) return;
+    }    
+
+    var j = copy_it(f, 'j');
+    j = successor(j)
+    if (equal(j, l)) return;
+
+    while ( ! equal(successor(j, false), l)) {
+        if ( ! p(source(j))) {
+            iter_swap(f, j);
+            f = successor(f);
+        }
+        j = successor(j);
+    }
+    iter_swap(f, j);
+    remove_it(j);
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var f = begin(d, "f");
+var l = end(d, "l");
+
+partition_semistable_nonempty(f, l, even);`
+
+};
+
+function getSnippet(snippet) {
+    var res = snippets[snippet];
+    if (res) {
+        return res;
+    }
+    return '';
+}
+
+function fillCatalog() {
+    var list = document.getElementById('list');
+    list.innerHTML = '';
+
+    // for(var key in Object.keys(snippets)){
+    for(var key in snippets){
+        // var value = snippets[key];
+        // console.log(key)
+        // console.log(value)
+    
+        // list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=">[About]</a></li>';
+        list.innerHTML += '<li><a href="file:///Users/fernando/dev/algorithms-animator/interpreter/index.html?snippet=' + key + '">[' + key + ']</a></li>';
+    }
+}
+
+
 function Iterator(data, index, name) {
     this.data = data;
     this.index = index;
@@ -67,10 +291,17 @@ function updateStats() {
     hg_right_x_b.innerHTML += '<p id="Status"><b>Assignments</b>:            ' + stats_assigments+ '</p>';
 }
 
-function addLog(text) {
+
+function clearLog() {
     var hg_right_b_b = document.getElementById('hg-right-b-b');
-    // hg_right_b_b.innerHTML = '';
-    hg_right_b_b.innerHTML += '<p id="Status">' + text+ '</p>';
+    hg_right_b_b.innerHTML = '';
+}
+
+function addLog(text) {
+    if (log_stats_enabled) {
+        var hg_right_b_b = document.getElementById('hg-right-b-b');
+        hg_right_b_b.innerHTML += '<p id="Status">' + text+ '</p>';
+    }
 }
 
 function addLogEqual(a, b, res) {
@@ -95,8 +326,16 @@ function addLogSink(it, x) {
     addLog('sink(' + it.data.name + '<sub>' + it.index + '</sub>, ' + x + ')');
 }
 
+function addLogSwap(a, b) {
+    addLog('swap(' + a.data.name + '<sub>' + a.index + '</sub>, ' + b.data.name + '<sub>' + b.index + '</sub>)');
+}
+
 function addLogPredicate(name, x, res) {
     addLog(name + '(' + x + ') = ' + res);
+}
+
+function addLogRelation(name, x, y, res) {
+    addLog(name + '(' + x + ', ' + y + ') = ' + res);
 }
 
 
@@ -111,27 +350,27 @@ function resetStatus() {
     resetStats();
 }
 
+function showError(text) {
+    var msg = '<p id="OutputMsg"><span style="color:red">ERROR: </span>' + text + '</p>';
+
+    var output = document.getElementById('hg-right-y');
+    output.innerHTML += msg;
+    // hljs.highlightBlock(output);
+
+    console.log(arguments.length ? text : '');
+}
+
 
 function initFunctions(interpreter, scope) {
     var alert_wrapper = function(text) {
         return alert(arguments.length ? text : '');
     };
 
-    var error = function(text) {
-        var msg = '<p id="OutputMsg"><span style="color:red">ERROR: </span>' + text + '</p>';
-
-        var output = document.getElementById('output');
-        output.innerHTML += msg;
-        // hljs.highlightBlock(output);
-
-        console.log(arguments.length ? text : '');
-
-    }
 
     var print_wrapper = function(text) {
         var msg = '<p id="OutputMsg"><span style="color:cyan">INFO: </span>' + text + '</p>';
 
-        var output = document.getElementById('output');
+        var output = document.getElementById('hg-right-y');
         output.innerHTML += msg;
         // hljs.highlightBlock(output);
 
@@ -165,7 +404,7 @@ function initFunctions(interpreter, scope) {
 
         // console.log(it_par.index)
         if (it_par.index >= max) {
-            error('out of range');
+            showError('out of range');
             disable('disabled');
             return;
         }
@@ -176,7 +415,9 @@ function initFunctions(interpreter, scope) {
         var it = new Iterator(it_par.data, it_par.index + 1, it_par.name);
         iterators_int[it.name] = it;
 
-        ++stats_it_moves;
+        if (log_stats_enabled) {
+            ++stats_it_moves;
+        }
 
         updateStatus();
         addLogSuccessor(it_par, it)
@@ -186,7 +427,7 @@ function initFunctions(interpreter, scope) {
     var predecessor_wrapper = function(it_par, move = true) {
         // console.log(it_par.index)
         if (it_par.index <= 0) {
-            error('out of range');
+            showError('out of range');
             disable('disabled');
             return;
         }
@@ -196,7 +437,10 @@ function initFunctions(interpreter, scope) {
         }
         var it = new Iterator(it_par.data, it_par.index - 1, it_par.name);
         iterators_int[it.name] = it;
-        ++stats_it_moves;
+        
+        if (log_stats_enabled) {
+            ++stats_it_moves;
+        }
 
         updateStatus();
 
@@ -261,11 +505,18 @@ function initFunctions(interpreter, scope) {
         return it;
     };
 
+    var source_value = function(it) {
+        var data = it.data.data;
+        var s = data[it.index];
+        return s;
+    };
+
+
     var source_wrapper = function(it) {
         var data = it.data.data;
         var max = data.length;
         if (it.index >= max) {
-            error('not valid iterator to take the source.');
+            showError('not valid iterator to take the source.');
             disable('disabled');
             return;
         }
@@ -287,7 +538,7 @@ function initFunctions(interpreter, scope) {
 
         var max = data.length;
         if (it.index >= max) {
-            error('not valid iterator to take the source.');
+            showError('not valid iterator to take the source.');
             disable('disabled');
             return;
         }
@@ -297,7 +548,10 @@ function initFunctions(interpreter, scope) {
         data[it.index] = x;
         elements[it.index].group.children[1].value = x;
 
-        ++stats_assigments;
+        if (log_stats_enabled) {
+            ++stats_assigments;
+        }
+
         updateStatus();
         two.update();
     };
@@ -305,7 +559,11 @@ function initFunctions(interpreter, scope) {
     var equal_wrapper = function(a, b) {
         // addLog('equal(' + a.index + ', ' + b.index + ')');
         // addLog('equal(' + a.data.name + ', ' + b.index + ')');
-        ++stats_it_cmps;
+
+        if (log_stats_enabled) {
+            ++stats_it_cmps;
+        }
+
         updateStatus();
         var res = a.index == b.index;
         addLogEqual(a, b, res)
@@ -316,7 +574,7 @@ function initFunctions(interpreter, scope) {
     var copy_it_wrapper = function(it, name, color) {
 
         if ( ! color) {
-            console.log(Object.keys(iterators_int).length)
+            // console.log(Object.keys(iterators_int).length)
             color = iterators_colors[Object.keys(iterators_int).length];
         }
 
@@ -343,27 +601,28 @@ function initFunctions(interpreter, scope) {
 
 
     var iter_swap_wrapper = function(a, b) {
-        var data = a.data;
+        var data = a.data.data;
+        // console.log(a)
+        // console.log(data)
         var elements = a.data.elements;
 
         var tmp_fill = elements[a.index].group.children[0].fill;
         elements[a.index].group.children[0].fill = elements[b.index].group.children[0].fill;
         elements[b.index].group.children[0].fill = tmp_fill;
 
-        var tmp = source_wrapper(a);
-        // data[a.index] = source_wrapper(b);
-        data.properties[a.index] = source_wrapper(b);
-        elements[a.index].group.children[1].value = source_wrapper(b);
+        var tmp = source_value(a);
+        data[a.index] = source_value(b);
+        elements[a.index].group.children[1].value = source_value(b);
 
-        // data[b.index] = tmp;
-        data.properties[b.index] = tmp;
+        data[b.index] = tmp;
         elements[b.index].group.children[1].value = tmp;
-        // console.log(data)
 
+        if (log_stats_enabled) {
+            ++stats_swaps;
+            stats_assigments += 3;
+        }
 
-        ++stats_swaps;
-        stats_assigments += 3;
-
+        addLogSwap(a, b);
         updateStatus();
         two.update();
     };
@@ -373,7 +632,7 @@ function initFunctions(interpreter, scope) {
         // console.log(data_par);
 
         if (sequences[name] != undefined) {
-            error('sequence "' + name + '" already exists.');
+            showError('sequence "' + name + '" already exists.');
             disable('disabled');
             return null;
         }
@@ -388,8 +647,6 @@ function initFunctions(interpreter, scope) {
         // console.log(data);
         // elements = drawArray(two, data, name);
         var elems = drawArray(two, data, name, Object.keys(sequences).length);
-
-        
 
         var retobj = {
             name: name,
@@ -417,21 +674,56 @@ function initFunctions(interpreter, scope) {
     };    
 
     var call_predicate_internal_wrapper = function(name, x, res) {
-        ++stats_pred_appls;
+        if (log_stats_enabled) {
+            ++stats_pred_appls;
+        }
         updateStatus();
 
         addLogPredicate(name, x, res);
 
-        //TODO
-        var hg_right_x_a = document.getElementById('hg-right-x-a');
-        var text = '<p id="Status">' + name + '(' + x + ') = ' + res + '</p>';
-        hg_right_x_a.innerHTML += text;
+        if (log_stats_enabled) {
+            //TODO
+            var hg_right_x_a = document.getElementById('hg-right-x-a');
+            var text = '<p id="Status">' + name + '(' + x + ') = ' + res + '</p>';
+            hg_right_x_a.innerHTML += text;
+        }
     };    
 
-    var fill_elem_wrapper = function(i, c) {
+    var call_relation_internal_wrapper = function(name, x, y, res) {
+        if (log_stats_enabled) {
+            ++stats_pred_appls;
+        }
+        updateStatus();
+
+        addLogRelation(name, x, y, res);
+
+        if (log_stats_enabled) {
+            //TODO
+            var hg_right_x_a = document.getElementById('hg-right-x-a');
+            var text = '<p id="Status">' + name + '(' + x + ', ' + y + ') = ' + res + '</p>';
+            hg_right_x_a.innerHTML += text;
+        }
+    };    
+
+    
+
+    var fill_elem_wrapper = function(data, i, c) {
+        var elements = data.elements;
         let elem = elements[i];
         elem.rect.fill = c;
     };    
+
+    var enable_log_stats_wrapper = function() {
+        log_stats_enabled = true;
+    };    
+
+    var disable_log_stats_wrapper = function() {
+        log_stats_enabled = false;
+    };    
+    
+
+    
+    
 
     interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
     interpreter.setProperty(scope, 'print',          interpreter.createNativeFunction(print_wrapper));
@@ -451,28 +743,35 @@ function initFunctions(interpreter, scope) {
     interpreter.setProperty(scope, 'fill_elem',      interpreter.createNativeFunction(fill_elem_wrapper));
     // interpreter.setProperty(scope, 'increment_predicate_stats', interpreter.createNativeFunction(increment_predicate_stats_wrapper));
     interpreter.setProperty(scope, 'call_predicate_internal', interpreter.createNativeFunction(call_predicate_internal_wrapper));
+    interpreter.setProperty(scope, 'call_relation_internal', interpreter.createNativeFunction(call_relation_internal_wrapper));
+
+    interpreter.setProperty(scope, 'enable_log_stats', interpreter.createNativeFunction(enable_log_stats_wrapper));
+    interpreter.setProperty(scope, 'disable_log_stats', interpreter.createNativeFunction(disable_log_stats_wrapper));
     
 }
 
 function callPredCode() {
     return 'function call_predicate(p, name, x){var res = p(x); call_predicate_internal(name, x, res); return res;};\n'
          + 'function predicate(p, name) {return function(x) {return call_predicate(p, name, x);};}\n'
-         + 'function call_relation(r, x, y){var res = r(x, y);increment_predicate_stats();return res;}\n'
-         + 'function relation(r){return function(x, y){return call_relation(r, x, y);};}\n';
+         + 'function call_relation(r, name, x, y){var res = r(x, y); call_relation_internal(name, x, y, res); return res;}\n'
+         + 'function relation(r, name){return function(x, y){return call_relation(r, name, x, y);};}\n'
+         + 'function random_array(n, from, to) {if ( ! n) n = 10;if ( ! from) from = 0;if ( ! to) to = 99;var res = []; while (n != 0) { var rand = Math.floor(Math.random() * to) + from; res.push(rand); --n;} return res; }\n';
 }
 
 function addSequenceCode() {
     return 'function add_sequence(d, n, p) {' + '\n' +
+    '    disable_log_stats();' + '\n' +
     '    var obj = add_sequence_internal(d, n, p);' + '\n' +
-    '    if ( ! obj) return obj;' + '\n' +
+    '    if ( ! obj) {enable_log_stats(); return obj;}' + '\n' +
     '    if (p) {' + '\n' +    
-    '        for (var i = 0; i < data.length; ++i) {' + '\n' +
-    '            var value = data[i];' + '\n' +
+    '        for (var i = 0; i < d.length; ++i) {' + '\n' +
+    '            var value = d[i];' + '\n' +
     '            if ( ! p(value)) {' + '\n' +
-    '                fill_elem(i, "#ff9191");' + '\n' +
+    '                fill_elem(obj, i, "#ff9191");' + '\n' +
     '            }' + '\n' +
     '        }' + '\n' +
     '    }' + '\n' +
+    '    enable_log_stats();' + '\n' +
     '    return obj;' + '\n' +
     '}'+ '\n'
 }
@@ -530,12 +829,14 @@ function editButton() {
     document.getElementById('editButton').style.display = "none";
     document.getElementById('restartButton').style.display = "none";
 
-    var output = document.getElementById('output');
+    var output = document.getElementById('hg-right-y');
     output.innerHTML = '';
 
     var hg_right_x_a = document.getElementById('hg-right-x-a');
-    console.log(hg_right_x_a.innerHTML);
+    // console.log(hg_right_x_a.innerHTML);
     hg_right_x_a.innerHTML = '';
+
+    clearLog();
 
     two.clear();
 }
@@ -550,11 +851,13 @@ function restartButton() {
     document.getElementById('editButton').style.display = "none";
     document.getElementById('restartButton').style.display = "none";
 
-    var output = document.getElementById('output');
+    var output = document.getElementById('hg-right-y');
     output.innerHTML = '';
 
     var hg_right_x_a = document.getElementById('hg-right-x-a');
     hg_right_x_a.innerHTML = '';
+
+    clearLog();
 
     resetStatus();
     two.clear();
@@ -577,11 +880,13 @@ function startButton() {
     document.getElementById('editButton').style.display = "inline";
     document.getElementById('restartButton').style.display = "inline";
 
-    var output = document.getElementById('output');
+    var output = document.getElementById('hg-right-y');
     output.innerHTML = '';
 
     var hg_right_x_a = document.getElementById('hg-right-x-a');
     hg_right_x_a.innerHTML = '';
+
+    clearLog();
 
     two.clear();
     resetStatus();
@@ -590,13 +895,17 @@ function startButton() {
     codeHighlight.innerHTML = codeView;
     hljs.highlightBlock(codeHighlight);
 
-    var output = document.getElementById('output');
-    hljs.highlightBlock(output);
+    // var output = document.getElementById('hg-right-y');
+    // hljs.highlightBlock(output);
 
-    myInterpreter = new Interpreter(codeAll, initFunctions);
-    disable('');
-
-    updateStatus();
+    try {
+        myInterpreter = new Interpreter(codeAll, initFunctions);    
+        disable('');
+        updateStatus();
+    } catch (error) {
+        editButton();
+        showError("parsing error");
+    }
 }
 
 function stepButton() {
