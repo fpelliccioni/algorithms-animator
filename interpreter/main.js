@@ -44,7 +44,37 @@ var it = find_backward_if(f, l, even);
 if ( ! equal(it, f)) {
     print(source(predecessor(it, false)));
 }
-`,min_element: 
+`
+
+,max_element: 
+`function max_element(f, l, r) {
+    if (equal(f, l)) return l;
+
+    var m = copy_it(f, 'm');
+    f = successor(f);
+
+    while ( ! equal(f, l)) {
+        if ( ! r(source(f), source(m))) {
+            m = assign_it(m, f);
+        }
+        f = successor(f);
+    }
+    remove_it(m);
+    return m;
+}
+
+var rel = relation(function(x, y) { return x < y; }, 'less');
+var d = add_sequence(random_array(), "d");
+
+var f = begin(d, "f");
+var l = end(d, "l");
+
+f = assign_it(f, max_element(f, l, rel));
+if ( ! equal(f, l)) {
+    print("The max element is: " + source(f));
+}`
+
+,min_element: 
 `function min_element(f, l, r) {
     if (equal(f, l)) return l;
 
@@ -70,8 +100,9 @@ var l = end(d, "l");
 f = assign_it(f, min_element(f, l, rel));
 if ( ! equal(f, l)) {
     print("The min element is: " + source(f));
-}
-`
+}`
+
+
 , iota: 
 `function iota(f, l, start, step) {
     if ( ! start) start = 0;
@@ -203,6 +234,57 @@ var l = end(d, "l");
 
 partition_semistable_nonempty(f, l, even);`
 
+
+
+,select_1_3:
+`// Median of 3
+
+function select_1_2(a, b, r) {
+    return r(b, a) ? a : b;
+}
+
+function select_1_3_ab(a, b, c, r) {
+    // precondition: a <= b
+    
+    return ! r(c, b) ? 
+                b :                  // a, b, c are sorted
+                select_1_2(a, c, r); // b is not the median
+}
+
+function select_1_3(a, b, c, r) {
+    return r(b, a) ? 
+              select_1_3_ab(b, a, c, r) 
+            : select_1_3_ab(a, b, c, r);
+}
+
+var r = relation(function(x, y) { return x < y; }, 'less');
+
+var tmp = random_array(3);
+
+var m = select_1_3(tmp[0], tmp[1], tmp[2], r);
+print(m);`
+
+
+,gcd:
+`function remainder(a, b) {
+    return a % b;
+}
+
+
+function gcd(a, b) {
+    while (b != 0) {
+        var tmp = remainder(a, b);
+        a = b;
+        a = tmp;
+        //a = remainder(a, b);
+        //swap(a, b);
+    }
+    return a;
+}
+
+var g = gcd(45, 17);
+print(g);
+`
 };
 
 function getSnippet(snippet) {
@@ -224,7 +306,7 @@ function fillCatalog() {
         // console.log(value)
     
         // list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=">[About]</a></li>';
-        list.innerHTML += '<li><a href="file:///Users/fernando/dev/algorithms-animator/interpreter/index.html?snippet=' + key + '">[' + key + ']</a></li>';
+        list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
     }
 }
 
@@ -868,7 +950,6 @@ function restartButton() {
 
 function startButton() {
     var codeAll = getAllCode();
-    // console.log(codeAll);
     var codeView = getViewCode();
     
     // document.getElementById('dataCodeArea').style.display = "none";
@@ -908,15 +989,51 @@ function startButton() {
     }
 }
 
+
+function drawScope(scope) {
+
+    var reserved = ['arguments', 'this', 'undefined', 'NaN', 'Infinity'];
+
+    console.clear();
+
+    var keys = Object.keys(scope.properties).sort();
+    for (var x in keys) {
+        // console.log(x);
+        // console.log(keys[x]);
+
+        var key = keys[x];
+
+        if ( ! reserved.includes(key)) {
+            var value = scope.properties[key];
+        
+            if (value) {
+                if ( ! value.class) {
+                    console.log(key);
+                    console.log(value);
+                }
+            } else {
+                console.log(key);
+                console.log(value);
+            }
+        }
+
+    }
+}
+
+
 function stepButton() {
     var codeHighlight = document.getElementById('codeHighlight');
     // console.log(codeHighlight.innerHTML)
 
 
     while (true) {
+        // console.log(myInterpreter)
+        // console.log(myInterpreter.stateStack)
+
         if (myInterpreter.stateStack.length) {
             // console.log("stepButton 1");
             var node = myInterpreter.stateStack[myInterpreter.stateStack.length - 1].node;
+            var scope = myInterpreter.stateStack[myInterpreter.stateStack.length - 1].scope;
             var start = node.start;
             var end = node.end;
         } else {
@@ -952,7 +1069,6 @@ function stepButton() {
         if (start < invisibleCode().length) {
             continue;
         }
-
         start -= invisibleCode().length;
         end -= invisibleCode().length;
 
@@ -969,6 +1085,9 @@ function stepButton() {
         var codeHighlight = document.getElementById('codeHighlight');
         codeHighlight.innerHTML = codeHtml;
         hljs.highlightBlock(codeHighlight);
+
+
+        // break; //TODO
 
 
         if (codeSelected.length == 1) {
@@ -1006,6 +1125,9 @@ function stepButton() {
             // console.log('continue 4')
             continue;
         }
+
+        drawScope(scope);
+
         prevLine = codeSelected;
 
 
