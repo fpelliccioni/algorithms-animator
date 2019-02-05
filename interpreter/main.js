@@ -275,7 +275,7 @@ function gcd(a, b) {
     while (b != 0) {
         var tmp = remainder(a, b);
         a = b;
-        a = tmp;
+        b = tmp;
         //a = remainder(a, b);
         //swap(a, b);
     }
@@ -330,6 +330,7 @@ function resetState() {
     iterators_gui = {};
     predicates = [];
     sequences = {};
+    variables = {};
 
     stats_it_moves = 0;
     stats_it_cmps = 0;
@@ -989,12 +990,25 @@ function startButton() {
     }
 }
 
+function addVariable(name, value) {
+    var elems = drawVariable(two, value, name, Object.keys(variables).length);
+
+    var retobj = {
+        name: name,
+        value: value,
+        elements: elems
+    };
+
+    variables[name] = retobj;
+}
 
 function drawScope(scope) {
 
     var reserved = ['arguments', 'this', 'undefined', 'NaN', 'Infinity'];
 
-    console.clear();
+    // console.clear();
+    two.clear();
+    variables = [];
 
     var keys = Object.keys(scope.properties).sort();
     for (var x in keys) {
@@ -1008,12 +1022,16 @@ function drawScope(scope) {
         
             if (value) {
                 if ( ! value.class) {
-                    console.log(key);
-                    console.log(value);
+                    // console.log(key);
+                    // console.log(value);
+
+                    addVariable(key, value);
+            
                 }
             } else {
-                console.log(key);
-                console.log(value);
+                // console.log(key);
+                // console.log(value);
+                addVariable(key, value);
             }
         }
 

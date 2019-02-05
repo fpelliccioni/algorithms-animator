@@ -8,6 +8,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 var defaultLeftMargin = 10;
 var defaultTopMargin = 0;
 var sequenceTotalHeight = 140;
+var variableTotalHeight = 70;
 
 // var rectWidth = 80;
 // var rectHeight = 120;
@@ -51,6 +52,27 @@ function drawElement(two, x, y, text, index, color = '#bfffb3') {
 
 
     var group = two.makeGroup(rect, text, textIndex);
+    // console.log(group.x)
+    // return group;
+
+    return {
+        group: group,
+        rect: rect
+    };
+}
+
+function drawElementSimple(two, x, y, text, color = '#bfffb3') {
+
+    var rect = two.makeRectangle(x, y + 30, rectWidth, rectHeight);
+    rect.fill = color;
+    rect.stroke = 'black'
+    rect.linewidth = 1;
+
+    var text = two.makeText(text, x, y + 30 + 1.5);
+    text.family = "Source Code Pro";
+    text.size = fontSize
+
+    var group = two.makeGroup(rect, text);
     // console.log(group.x)
     // return group;
 
@@ -144,6 +166,32 @@ function drawArray(two, arr, name, id) {
 
     var e_last = drawPastLast(two, leftMargin + rectWidth / 2 + arr.length * rectWidth, topMargin);
     elements.push(e_last)
+
+    two.update();
+
+    return elements;
+}
+
+function drawVariable(two, value, name, id) {
+    
+    var elements = []
+
+    var leftMargin = defaultLeftMargin;
+    var topMargin = defaultTopMargin + id * variableTotalHeight;
+
+    if (name) {
+        name += ":"
+        var text = two.makeText(name, leftMargin, topMargin + 30);
+        text.family = "Source Code Pro";
+        text.size = labelFontSize
+        text.alignment = 'left'
+        text.fill = '#99ff99';
+        leftMargin += 14.46 * name.length
+    }
+
+    let index = 0;
+    var e = drawElementSimple(two,  leftMargin + rectWidth / 2 + index * rectWidth, topMargin, value);
+    elements.push(e)
 
     two.update();
 
