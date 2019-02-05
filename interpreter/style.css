@@ -835,9 +835,9 @@ button:hover {
 
 
 
-/* ::-webkit-scrollbar {
+::-webkit-scrollbar {
     display: none;
-} */
+}
 
 
 /* mark {
