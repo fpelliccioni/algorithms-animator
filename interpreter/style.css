@@ -589,6 +589,7 @@ form#settings input[type="checkbox"] ~ span {
   /* border-top: 1px dotted #009900; */
 
   height: 60%;
+  max-height: 60%;
   /* flex: auto; */
   display: flex;
   flex-direction: row;
@@ -606,6 +607,7 @@ form#settings input[type="checkbox"] ~ span {
 
 #hg-right-b-b { 
   flex: auto;
+  /* flex-grow: 1; */
   /* background: red; */
   /* border-left: 1px dotted #009900; */
 
@@ -685,19 +687,19 @@ form#settings input[type="checkbox"] ~ span {
 button {
   border: 0;
   background: none;
-  /* box-shadow: none; */ nav
+  /* box-shadow: none; nav */ 
   border-radius: 0px;
   /* color: #bfffb3; */
-  /* background-color: co nav
+  /* background-color: co nav*/
   /* height: 3em; */
   /* width: 10em; */
 
-  /* text-decoration: non nav
-  /* text-decoration: und nav
+  /* text-decoration: non nav*/
+  /* text-decoration: und nav*/
   color: #009900;
   outline: 0;
 
-  font-family: "Source Co nav
+  font-family: "Source Code Pro", monospace;
   font-size: 14pt;
 }
 
@@ -833,9 +835,9 @@ button:hover {
 
 
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
     display: none;
-}
+} */
 
 
 /* mark {
