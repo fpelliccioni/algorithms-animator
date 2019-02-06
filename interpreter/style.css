@@ -605,13 +605,50 @@ form#settings input[type="checkbox"] ~ span {
   flex-direction: column;
 }
 
+
+/* #hg-right-b-b-parent { 
+  flex: auto;
+}
+
+#hg-right-b-b { 
+  overflow-y: scroll;
+} */
+
+
 #hg-right-b-b { 
   flex: auto;
   /* flex-grow: 1; */
   /* background: red; */
   /* border-left: 1px dotted #009900; */
 
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
+}
+
+
+#hg-right-b-b-data { 
+
+  font-family: "Source Code Pro", monospace;
+  font-size: 10pt;
+  margin:0; 
+  padding:0;
+  color: #009900;
+  /* text-align: center; */
+  
+
+  width:100%;
+  height:100%; 
+  box-sizing: border-box;         /* For IE and modern versions of Chrome */
+  -moz-box-sizing: border-box;    /* For Firefox                          */
+  -webkit-box-sizing: border-box; /* For Safari                           */
+
+  border: none;
+  resize: none;
+  overflow: auto;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
 }
 
 #hg-right-x { 

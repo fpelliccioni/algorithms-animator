@@ -304,8 +304,8 @@ function fillCatalog() {
         // console.log(key)
         // console.log(value)
     
-        // list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=">[About]</a></li>';
-        list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
+        // list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
+        list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + key + '">[' + key + ']</a></li>';
     }
 }
 
@@ -379,43 +379,94 @@ function updateStats() {
     hg_right_x_b.innerHTML += '<p id="Status"><b>Assignments</b>:            ' + stats_assigments+ '</p>';
 }
 
+function subscript_digit(digit) {
+    if (digit == '1') return '\u2081';
+    if (digit == '2') return '\u2082';
+    if (digit == '3') return '\u2083';
+    if (digit == '4') return '\u2084';
+    if (digit == '5') return '\u2085';
+    if (digit == '6') return '\u2086';
+    if (digit == '7') return '\u2087';
+    if (digit == '8') return '\u2088';
+    if (digit == '9') return '\u2089';
+
+    return '\u2080';
+}
+function subscript(number) {
+    // console.log(number)
+    var nText = number.toString();
+    var res = '';
+    // for (var c in nText) {
+    //     console.log(c)
+    //     console.log(subscript_digit(c))
+    //     res += subscript_digit(c);
+    // }
+
+    for (var i = 0; i < nText.length; i++) {
+        var c = nText.charAt(i);
+        // console.log(c)
+        // console.log(subscript_digit(c))
+        res += subscript_digit(c);
+    }
+      
+    return res;
+}
 
 function clearLog() {
-    var hg_right_b_b = document.getElementById('hg-right-b-b');
-    hg_right_b_b.innerHTML = '';
+    // var hg_right_b_b = document.getElementById('hg-right-b-b');
+    // hg_right_b_b.innerHTML = '';
+    var hg_right_b_b_data = document.getElementById('hg-right-b-b-data');
+    // hg_right_b_b_data.innerHTML = '';
+    hg_right_b_b_data.value = '';
+    // hg_right_b_b_data.value = subscript('1232');
+
+    // console.log(hg_right_b_b_data.value);
+
+    // var text = '\u2080';
+    // // $('hg-right-b-b-data').val($('hg-right-b-b-data').val() + ' ' + text);
+
+    // hg_right_b_b_data.value += text;
+    // console.log(hg_right_b_b_data.value);
 }
 
 function addLog(text) {
     if (log_stats_enabled) {
-        var hg_right_b_b = document.getElementById('hg-right-b-b');
-        hg_right_b_b.innerHTML += '<p id="Status">' + text+ '</p>';
+        // var hg_right_b_b = document.getElementById('hg-right-b-b');
+        // hg_right_b_b.innerHTML += '<p id="Status">' + text+ '</p>';
+        var hg_right_b_b_data = document.getElementById('hg-right-b-b-data');
+        // hg_right_b_b_data.innerHTML += text + '\n';
+        hg_right_b_b_data.value += text + '\n';
     }
 }
 
 function addLogEqual(a, b, res) {
-    addLog('equal(' + a.data.name + '<sub>' + a.index + '</sub>, ' + b.data.name + '<sub>' + b.index + '</sub>) = ' + res);
+    // addLog('equal(' + a.data.name + '<sub>' + a.index + '</sub>, ' + b.data.name + '<sub>' + b.index + '</sub>) = ' + res);
+    addLog('equal(' + a.data.name + subscript(a.index) + ', ' + b.data.name  + subscript(b.index) + ') = ' + res);
 }
 
 function addLogSuccessor(it, res_it) {
-    addLog('successor(' + it.data.name + '<sub>' + it.index + '</sub>) = ' + res_it.data.name + '<sub>' + res_it.index + '</sub>');
+    // addLog('successor(' + it.data.name + '<sub>' + it.index + '</sub>) = ' + res_it.data.name + '<sub>' + res_it.index + '</sub>');
+    addLog('successor(' + it.data.name + subscript(it.index) + ') = ' + res_it.data.name + subscript(res_it.index) + '');
 }
 
 function addLogPredecessor(it, res_it) {
-    // console.log(it)
-    // console.log(res_it)
-    addLog('predecessor(' + it.data.name + '<sub>' + it.index + '</sub>) = ' + res_it.data.name + '<sub>' + res_it.index + '</sub>');
+    // addLog('predecessor(' + it.data.name + '<sub>' + it.index + '</sub>) = ' + res_it.data.name + '<sub>' + res_it.index + '</sub>');
+    addLog('predecessor(' + it.data.name + subscript(it.index) + ') = ' + res_it.data.name + subscript(res_it.index) + '');
 }
 
 function addLogSource(it, res) {
-    addLog('source(' + it.data.name + '<sub>' + it.index + '</sub>) = ' + res);
+    // addLog('source(' + it.data.name + '<sub>' + it.index + '</sub>) = ' + res);
+    addLog('source(' + it.data.name + subscript(it.index) + ') = ' + res);
 }
 
 function addLogSink(it, x) {
-    addLog('sink(' + it.data.name + '<sub>' + it.index + '</sub>, ' + x + ')');
+    // addLog('sink(' + it.data.name + '<sub>' + it.index + '</sub>, ' + x + ')');
+    addLog('sink(' + it.data.name + subscript(it.index) + ', ' + x + ')');
 }
 
 function addLogSwap(a, b) {
-    addLog('swap(' + a.data.name + '<sub>' + a.index + '</sub>, ' + b.data.name + '<sub>' + b.index + '</sub>)');
+    // addLog('swap(' + a.data.name + '<sub>' + a.index + '</sub>, ' + b.data.name + '<sub>' + b.index + '</sub>)');
+    addLog('swap(' + a.data.name + subscript(a.index) + ', ' + b.data.name + subscript(b.index) + ')');
 }
 
 function addLogPredicate(name, x, res) {
