@@ -8,6 +8,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 var log_stats_enabled = true;
 
 var snippets = {
+
+
 find_if: 
 `function find_if(f, l, p) {
     while ( ! equal(f, l) && ! p(source(f))) {
@@ -24,8 +26,9 @@ var l = end(d);
 var it = find_if(f, l, even);
 if ( ! equal(it, l)) {
     print(source(it));
-}
-`
+}`
+
+
 , find_backward_if: 
 `function find_backward_if(f, l, p) {
     while (true) {
@@ -284,6 +287,150 @@ var b = random_int();
 
 var g = gcd(a, b);
 print(g);`
+
+
+, equal: 
+`function equal_r(f, l, f2, r) {
+    while ( ! equal(f, l)) {
+        if ( ! r(source(f), source(f2))) {
+            return false;
+        }
+
+        f = successor(f);
+        f2 = successor(f2);
+    }
+    return true;
+}
+
+var d1_raw = ['e', 'v', 'i', 't', 'a', 't', 'i', 'v', 'e'];
+var d2_raw = ['e', 'v', 'i', 't', 'x', 't', 'i', 'v', 'e'];
+
+var eq = relation(function(x, y) {return x == y;}, "eq");
+var d1 = add_sequence(d1_raw, "d1");
+var d2 = add_sequence(d2_raw, "d2");
+
+var f = begin(d1);
+var l = end(d1);
+var f2 = begin(d2);
+
+var res = equal_r(f, l, f2, eq);
+print(res);`
+
+
+, palindrome_naive:
+`
+function equal_r(f, l, f2, r) {
+    while ( ! equal(f, l)) {
+        if ( ! r(source(f), source(f2))) {
+            return false;
+        }
+
+        f = successor(f);
+        f2 = successor(f2);
+    }
+    return true;
+}
+
+function palindrome_naive(seq_arr, r) {
+    var seq = add_sequence(seq_arr, "seq");
+    var seq_arr_rev = seq_arr.slice().reverse();
+    var seq_rev = add_sequence(seq_arr_rev, "seq_rev");
+
+    var f = begin(seq);
+    var l = end(seq);
+    var f2 = begin(seq_rev);
+
+    var res = equal_r(f, l, f2, r);
+
+    return res;
+}
+
+var eq_rel = relation(function(x, y) {return x == y;}, "eq_rel");
+
+//var word_arr = ['e', 'v', 'i', 't', 'a', 't', 'i', 'v', 'e'];
+var word_arr = ['e', 'v', 'i', 'x', 'a', 't', 'i', 'v', 'e'];
+
+var res = palindrome_naive(word_arr, eq_rel);
+if (res) {
+    print('the word is palindrome');
+} else {
+    print('the word not is palindrome');
+};`
+
+
+
+, palindrome_forward_recursive:
+`function palindrome_forward_recursive(f, n, r) {
+    if (n == 0) return [true, f];
+    if (n == 1) return [true, successor(f)];
+
+    var ret = palindrome_forward_recursive(successor(f), n - 2, r);
+    var ret_first = ret[0];
+    var f2 = ret[1];
+
+    if ( ! ret_first) return ret;
+    if ( ! r(source(f), source(f2))) return [false, f2];
+
+    return [true, successor(f2)];
+}
+
+function palindrome_forward(f, n, r) {
+    return palindrome_forward_recursive(f, n, r)[0];
+}
+
+var eq_rel = relation(function(x, y) {return x == y;}, "eq_rel");
+
+var word = add_sequence(['e', 'v', 'i', 't', 'a', 't', 'i', 'v', 'e'], "word");
+// var word = add_sequence(['e', 'v', 'i', 'x', 'a', 't', 'i', 'v', 'e'], "word");
+
+var f = begin(word);
+var n = size(word);
+
+var res = palindrome_forward(f, n, eq_rel);
+
+
+if (res[0]) {
+    print('the word is palindrome');
+} else {
+    print('the word not is palindrome');
+};`
+
+
+
+
+, palindrome_bidirectional:
+`function palindrome_bidirectional(f, l, r) {
+    while (true) {
+        if (equal(f, l)) break;
+        l = predecessor(l);
+
+        if ( ! r(source(f), source(l))) return false;
+
+        f = successor(f);
+        if (equal(f, l)) break;
+    }
+    return true;
+}
+
+var eq_rel = relation(function(x, y) {return x == y;}, "eq_rel");
+
+//var word = add_sequence(['e', 'v', 'i', 't', 'a', 't', 'i', 'v', 'e'], "word");
+//var word = add_sequence(['e', 'v', 'i', 'x', 'a', 't', 'i', 'v', 'e'], "word");
+var word = add_sequence(['e', 'v', 'i', 't', 't', 'i', 'v', 'e'], "word");
+
+var f = begin(word);
+var l = end(word);
+
+var res = palindrome_bidirectional(f, l, eq_rel);
+
+if (res) {
+    print('the word is palindrome');
+} else {
+    print('the word not is palindrome');
+};`
+
+
+
 };
 
 function getSnippet(snippet) {
@@ -304,8 +451,8 @@ function fillCatalog() {
         // console.log(key)
         // console.log(value)
     
-        // list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
-        list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + key + '">[' + key + ']</a></li>';
+        list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
+        // list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + key + '">[' + key + ']</a></li>';
     }
 }
 
@@ -639,6 +786,16 @@ function initFunctions(interpreter, scope) {
         return it;
     };
 
+    var size_wrapper = function(arr, name, color) {
+
+        var length = arr.data.length
+        return length;
+
+        // updateStatus();
+        // return it;
+    };
+
+
     var source_value = function(it) {
         var data = it.data.data;
         var s = data[it.index];
@@ -868,6 +1025,8 @@ function initFunctions(interpreter, scope) {
     interpreter.setProperty(scope, 'predecessor',    interpreter.createNativeFunction(predecessor_wrapper));
     interpreter.setProperty(scope, 'begin',          interpreter.createNativeFunction(begin_wrapper));
     interpreter.setProperty(scope, 'end',            interpreter.createNativeFunction(end_wrapper));
+    interpreter.setProperty(scope, 'size',           interpreter.createNativeFunction(size_wrapper));
+    
     interpreter.setProperty(scope, 'source',         interpreter.createNativeFunction(source_wrapper));
     interpreter.setProperty(scope, 'sink',           interpreter.createNativeFunction(sink_wrapper));
     interpreter.setProperty(scope, 'equal',          interpreter.createNativeFunction(equal_wrapper));
