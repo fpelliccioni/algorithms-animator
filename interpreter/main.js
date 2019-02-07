@@ -235,6 +235,70 @@ var l = end(d);
 partition_semistable_nonempty(f, l, even);`
 
 
+,partition_copy:
+`function partition_copy(f, l, r_g, r_b, p) {
+    while ( ! equal(f, l)) {
+        if (p(source(f))) {
+            sink(r_g, source(f));
+            r_g = successor(r_g);
+        } else {
+            sink(r_b, source(f));
+            r_b = successor(r_b);
+        }
+        f = successor(f);
+    }
+    return [r_g, r_b];
+}
+
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var good = add_sequence(new Array(size(d)), "good");
+var bad = add_sequence(new Array(size(d)), "bad");
+
+var res = partition_copy(begin(d), end(d), begin(good), begin(bad), even);
+
+var fg = res[0];
+var fb = res[1];
+
+print('...');`
+
+
+
+,partition_point_n:
+`skip_debug('half_nonnegative');
+
+function half_nonnegative(n) {
+    return n >> 1;
+}
+
+function partition_point_n(f, n, p) {
+    while (n != 0) {
+        var h = half_nonnegative(n);
+        var m = successor(f, h);
+
+        if (p(source(m))) {
+            n = h;
+        } else {
+            n -= h + 1;
+            f = successor(m);
+        }
+    }
+    return f;
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence([1, 5, 1, 1, 3, 3, 3, 7, 3, 2, 6, 4], "d", even);
+
+var p = partition_point_n(begin(d), size(d), even);
+
+print('partition point: ' + source(p));`
+
+
+
+
+
+
 
 ,select_1_3:
 `// Median of 3
@@ -478,6 +542,7 @@ function resetState() {
 
     lines = [];
     prevLine = "";
+    prevNodeType = "";
     iterators_int = {};
     iterators_gui = {};
     predicates = [];
@@ -648,9 +713,10 @@ function showError(text) {
 
 
 function initFunctions(interpreter, scope) {
-    var alert_wrapper = function(text) {
-        return alert(arguments.length ? text : '');
-    };
+
+    // var alert_wrapper = function(text) {
+    //     return alert(arguments.length ? text : '');
+    // };
 
 
     var print_wrapper = function(text) {
@@ -678,21 +744,18 @@ function initFunctions(interpreter, scope) {
     // };
 
 
-    var successor_wrapper = function(it_par, move = true) {
+    var successor_wrapper = function(it_par, step = 1) {
         var data = it_par.data.data;
         var max = data.length;
 
         // console.log(it_par.index)
-        if (it_par.index >= max) {
+        if (it_par.index + step >= max) {
             showError('out of range');
             disable('disabled');
             return;
         }
 
-        // if (move && iterators_gui[it_par.name]) {
-        //     moveIteratorTo(two, iterators_gui[it_par.name], it_par.data.elements[it_par.index + 1])
-        // }
-        var it = new Iterator(it_par.data, it_par.index + 1, it_par.name);
+        var it = new Iterator(it_par.data, it_par.index + step, it_par.name);
         if (iterators_int[it.name]) {
             iterators_int[it.name] = it;
         }
@@ -706,18 +769,15 @@ function initFunctions(interpreter, scope) {
         return it;
     };
 
-    var predecessor_wrapper = function(it_par, move = true) {
+    var predecessor_wrapper = function(it_par, step = 1) {
         // console.log(it_par.index)
-        if (it_par.index <= 0) {
+        if (it_par.index - step <= 0) {
             showError('out of range');
             disable('disabled');
             return;
         }
 
-        // if (move && iterators_gui[it_par.name]) {
-        //     moveIteratorTo(two, iterators_gui[it_par.name], it_par.data.elements[it_par.index - 1])
-        // }
-        var it = new Iterator(it_par.data, it_par.index - 1, it_par.name);
+        var it = new Iterator(it_par.data, it_par.index - step, it_par.name);
         if (iterators_int[it.name]) {
             iterators_int[it.name] = it;
         }
@@ -1015,11 +1075,13 @@ function initFunctions(interpreter, scope) {
         log_stats_enabled = false;
     };    
     
+    var skip_debug_wrapper = function(name) {
+        skipped.push(name);
+        console.log(skipped);
+    };    
 
-    
-    
 
-    interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
+    // interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
     interpreter.setProperty(scope, 'print',          interpreter.createNativeFunction(print_wrapper));
     interpreter.setProperty(scope, 'successor',      interpreter.createNativeFunction(successor_wrapper));
     interpreter.setProperty(scope, 'predecessor',    interpreter.createNativeFunction(predecessor_wrapper));
@@ -1043,7 +1105,9 @@ function initFunctions(interpreter, scope) {
 
     interpreter.setProperty(scope, 'enable_log_stats', interpreter.createNativeFunction(enable_log_stats_wrapper));
     interpreter.setProperty(scope, 'disable_log_stats', interpreter.createNativeFunction(disable_log_stats_wrapper));
-    
+ 
+    interpreter.setProperty(scope, 'skip_debug', interpreter.createNativeFunction(skip_debug_wrapper));
+ 
 }
 
 function callPredCode() {
@@ -1356,6 +1420,28 @@ function drawScope(scope) {
 }
 
 
+// Object.prototype.getName = function() { 
+//     var funcNameRegex = /function (.{1,})\(/;
+//     var results = (funcNameRegex).exec((this).constructor.toString());
+//     return (results && results.length > 1) ? results[1] : "";
+//  };
+
+
+function inside_skipped_function(scope) {
+    if (scope.parentScope == null) return false;
+
+    for (var i = 0; i < skipped.length; i+=1) {
+        // console.log("En el índice '" + i + "' hay este valor: " + skipped[i]);
+        // console.log()
+
+        if (scope.properties[skipped[i]] != undefined) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function stepButton() {
     var codeHighlight = document.getElementById('codeHighlight');
     // console.log(codeHighlight.innerHTML)
@@ -1368,7 +1454,8 @@ function stepButton() {
         if (myInterpreter.stateStack.length) {
             // console.log("stepButton 1");
             var node = myInterpreter.stateStack[myInterpreter.stateStack.length - 1].node;
-            var scope = myInterpreter.stateStack[myInterpreter.stateStack.length - 1].scope;
+            // var scope = myInterpreter.stateStack[myInterpreter.stateStack.length - 1].scope;
+            var scope = myInterpreter.getScope();
             var start = node.start;
             var end = node.end;
         } else {
@@ -1461,9 +1548,74 @@ function stepButton() {
             continue;
         }
 
-        drawScope(scope);
+        if (node.type == 'Literal') {
+            // console.log('********************* 33')
+            // console.log(node);
+            continue;
+        }
+
+        if (node.expression && node.expression.callee && node.expression.callee.name == 'skip_debug') {
+            // console.log('********************* 4')
+            // console.log(node.expression.callee.name);
+            // console.log(node);
+            continue;
+        }
+
+        if (node.callee && node.callee.name == 'skip_debug') {
+            // console.log('********************* 5')
+            // console.log(node.expression.callee.name);
+            // console.log(node);
+            continue;
+        }
+
+        if (node.name && node.name == 'skip_debug') {
+            // console.log('********************* 5')
+            // console.log(node.expression.callee.name);
+            // console.log(node);
+            continue;
+        }
+
+        if (inside_skipped_function(scope)) {
+            // console.log('********************* 55')
+            continue;
+        }
+
+
+        // console.log(codeSelected);
+        // console.log(myInterpreter.stateStack);
+        console.log(scope);
+        console.log(node);
+        // console.log(node.type);
+        // console.log(node.getName);
+
 
         prevLine = codeSelected;
+        prevNodeType = node.type;
+
+        if (node.type == 'BlockStatement') {
+            console.log('********************* 34')
+            // console.log(node);
+            continue;
+        }
+
+        console.log('*********************')
+        console.log(node.type);
+        console.log(prevNodeType);
+        console.log('*********************')
+
+        if (node.type == 'CallExpression' && prevNodeType == 'BlockStatement') {
+            console.log('!!!!!!!!!!!! 1 ')
+            continue;
+        }
+
+        if (node.type == 'VariableDeclaration' && prevNodeType == 'CallExpression') {
+            console.log('!!!!!!!!!!!!')
+            continue;
+        }
+
+
+        drawScope(scope);
+
 
 
         // if (countLineEnd == 0) {
