@@ -267,6 +267,7 @@ print('...');`
 
 ,partition_point_n:
 `skip_debug('half_nonnegative');
+var r = range_counted("f", "n");
 
 function half_nonnegative(n) {
     return n >> 1;
@@ -291,7 +292,6 @@ var even = predicate(function(x) {return x % 2 == 0;}, "even");
 var d = add_sequence([1, 5, 1, 1, 3, 3, 3, 7, 3, 2, 6, 4], "d", even);
 
 var p = partition_point_n(begin(d), size(d), even);
-
 print('partition point: ' + source(p));`
 
 
@@ -531,6 +531,16 @@ function Sequence(name, data, elements, colors) {
     this.data = data;
     this.elements = elements;
     this.colors = colors;
+}
+
+function RangeBounded(fname, lname) {
+    this.fname = fname;
+    this.lname = lname;
+}
+
+function RangeCounted(fname, nname) {
+    this.fname = fname;
+    this.nname = nname;
 }
 
 
@@ -1077,9 +1087,20 @@ function initFunctions(interpreter, scope) {
     
     var skip_debug_wrapper = function(name) {
         skipped.push(name);
-        console.log(skipped);
+        // console.log(skipped);
     };    
 
+    var range_bounded_wrapper = function(f, l) {
+        return new RangeBounded(f, l);
+    };    
+
+    var range_counted_wrapper = function(f, n) {
+        return new RangeCounted(f, n);
+    };    
+
+    
+
+    
 
     // interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
     interpreter.setProperty(scope, 'print',          interpreter.createNativeFunction(print_wrapper));
@@ -1107,7 +1128,11 @@ function initFunctions(interpreter, scope) {
     interpreter.setProperty(scope, 'disable_log_stats', interpreter.createNativeFunction(disable_log_stats_wrapper));
  
     interpreter.setProperty(scope, 'skip_debug', interpreter.createNativeFunction(skip_debug_wrapper));
+
+    interpreter.setProperty(scope, 'range_bounded', interpreter.createNativeFunction(range_bounded_wrapper));
+    interpreter.setProperty(scope, 'range_counted', interpreter.createNativeFunction(range_counted_wrapper));
  
+
 }
 
 function callPredCode() {
@@ -1285,6 +1310,24 @@ function addVariable(name, value, seqn) {
     variables[name] = retobj;
 }
 
+function find_ranges(scope) {
+
+    if (scope == null) return [];
+
+    var res = find_ranges(scope.parentScope);
+    var keys = Object.keys(scope.properties).sort();
+
+    for (var x in keys) {
+        var key = keys[x];
+        var value = scope.properties[key];
+        if (value && value instanceof RangeCounted) {
+            res.push(value);
+        }
+    }
+    return res;
+}
+
+
 function drawScope(scope) {
 
     var reserved = ['arguments', 'this', 'undefined', 'NaN', 'Infinity',
@@ -1302,7 +1345,10 @@ function drawScope(scope) {
     // console.clear();
     two.clear();
     variables = [];
-    
+
+    var ranges = find_ranges(scope);
+    // console.log(r);
+
     // console.log(two.width);
 
     var keys = Object.keys(scope.properties).sort();
@@ -1399,6 +1445,8 @@ function drawScope(scope) {
 
                 if (value instanceof Sequence) {
                 } else if (value instanceof Iterator) {
+                } else if (value instanceof RangeBounded) {
+                } else if (value instanceof RangeCounted) {
                 } else if (value instanceof Interpreter.Object) {
                 } else {
                     // console.log(key);
@@ -1415,7 +1463,21 @@ function drawScope(scope) {
                 // addVariable(key, value, seqn);
             }
         }
+    }
 
+    for (var i = 0; i < ranges.length; i++) {
+        var r = ranges[i];
+
+        if (r instanceof RangeBounded) {
+
+        } else if (r instanceof RangeCounted) {
+            var f = scope.properties[r.fname];
+            var n = scope.properties[r.nname];
+
+            if (f != undefined && n != undefined) {
+                drawCounterRange(f, n);
+            }
+        }
     }
 }
 
@@ -1489,6 +1551,7 @@ function stepButton() {
         // console.log(end);
 
         if (start < invisibleCode().length) {
+            //console.log('continue 0')
             continue;
         }
         start -= invisibleCode().length;
@@ -1509,11 +1572,9 @@ function stepButton() {
         hljs.highlightBlock(codeHighlight);
 
 
-        // break; //TODO
-
 
         if (codeSelected.length == 1) {
-            // console.log('continue 1')
+            //console.log('continue 1')
             continue;
         }
 
@@ -1521,12 +1582,12 @@ function stepButton() {
         // console.log(countLineEnd);
 
         if (countLineEnd > 1) {
-            // console.log('continue 2')
+            //console.log('continue 2')
             continue;
         }
 
         if (codeSelected[0] == '[' && codeSelected[codeSelected.length - 1] == ']') {
-            // console.log('continue 3')
+            //console.log('continue 3')
             continue;
         }
 
@@ -1544,76 +1605,82 @@ function stepButton() {
         // console.log(codeSelected)
         if (prevLine.includes(codeSelected)) {
             // prevLine = codeSelected;
-            // console.log('continue 4')
+            //console.log('continue 4')
             continue;
         }
 
         if (node.type == 'Literal') {
-            // console.log('********************* 33')
+            //console.log('continue 5')
             // console.log(node);
             continue;
         }
 
         if (node.expression && node.expression.callee && node.expression.callee.name == 'skip_debug') {
-            // console.log('********************* 4')
+            //console.log('continue 6')
             // console.log(node.expression.callee.name);
             // console.log(node);
             continue;
         }
 
         if (node.callee && node.callee.name == 'skip_debug') {
-            // console.log('********************* 5')
+            //console.log('continue 7')
             // console.log(node.expression.callee.name);
             // console.log(node);
             continue;
         }
 
         if (node.name && node.name == 'skip_debug') {
-            // console.log('********************* 5')
+            //console.log('continue 8')
             // console.log(node.expression.callee.name);
             // console.log(node);
             continue;
         }
 
         if (inside_skipped_function(scope)) {
-            // console.log('********************* 55')
+            //console.log('continue 9')
             continue;
         }
 
 
         // console.log(codeSelected);
         // console.log(myInterpreter.stateStack);
-        console.log(scope);
-        console.log(node);
+        // console.log(scope);
+        // console.log(node);
         // console.log(node.type);
         // console.log(node.getName);
 
 
-        prevLine = codeSelected;
-        prevNodeType = node.type;
 
-        if (node.type == 'BlockStatement') {
-            console.log('********************* 34')
-            // console.log(node);
-            continue;
-        }
+        // console.log('*********************')
+        // console.log(node.type);
+        // console.log(prevNodeType);
+        // console.log('*********************')
 
-        console.log('*********************')
-        console.log(node.type);
-        console.log(prevNodeType);
-        console.log('*********************')
 
         if (node.type == 'CallExpression' && prevNodeType == 'BlockStatement') {
-            console.log('!!!!!!!!!!!! 1 ')
+            prevNodeType = node.type;
+            //console.log('continue 11')
             continue;
         }
 
         if (node.type == 'VariableDeclaration' && prevNodeType == 'CallExpression') {
-            console.log('!!!!!!!!!!!!')
+            prevNodeType = node.type;
+            //console.log('continue 12')
             continue;
         }
 
 
+        prevNodeType = node.type;
+        prevLine = codeSelected;
+
+        if (node.type == 'BlockStatement') {
+            //console.log('continue 10')
+            // console.log(node);
+            continue;
+        }
+
+
+        // console.log('-----------------------------------')
         drawScope(scope);
 
 
