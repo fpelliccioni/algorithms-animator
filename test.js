@@ -160,9 +160,13 @@ function drawNamedElementFinish(x, name, text) {
 
 function drawNamedElementSimple(two, x, y, name, text, color = defaultElementColor) {
 
+    // console.log(text)
+    // console.log(text.toString())
+    // console.log(text.toString().length)
+
     var min_width = 2 * 19.2 + 5;
 
-    if (text && text.toString().length > 2) {
+    if (text != undefined && text.toString().length > 2) {
         var w = text.toString().length * 19.2 + 5;
     } else {
         // var w = rectWidth
@@ -205,6 +209,9 @@ function last_elem(dic) {
 
 function drawVariable(two, name, value, initTop) {
     
+    // console.log(name)
+    // console.log(value)
+
     var elements = []
 
     if ( ! initTop) {
@@ -216,6 +223,7 @@ function drawVariable(two, name, value, initTop) {
         var leftMargin = last.elements[0].x_finish;
         var topMargin = last.elements[0].y;
 
+        // console.log('drawNamedElementFinish')
         var finish = drawNamedElementFinish(leftMargin, name, value);
         if (finish > two.width) {
             var leftMargin = defaultLeftMargin;
@@ -226,6 +234,8 @@ function drawVariable(two, name, value, initTop) {
         var leftMargin = defaultLeftMargin;
     }
     
+    // console.log('drawNamedElementSimple')
+
     // var e = drawNamedElementSimple(two,  leftMargin + rectWidth / 2, topMargin + 30, name, value);
     var e = drawNamedElementSimple(two, leftMargin, topMargin, name, value);
     elements.push(e)
@@ -242,26 +252,42 @@ function drawCounterRange(f, n) {
     // console.log(iterators_gui[f.name]);
 
     var color = iterators_gui[f.name].children[0].fill;
-    console.log(color);
+    // console.log(color);
 
     var elem = f.data.elements[f.index];
     var x = elem.rect.translation._x;
     var y = elem.rect.translation._y + elem.rect.height / 2 + 24;
 
-    var elem_last = f.data.elements[f.index + n];
-    var x_last = elem_last.rect.translation._x - rectWidth / 2;
-    var y_last = elem_last.rect.translation._y + elem_last.rect.height / 2 + 20;
+    if (n != 0) {
+        var elem_last = f.data.elements[f.index + n - 1];
+        var x_last = elem_last.rect.translation._x + rectWidth / 2;
+        var y_last = elem_last.rect.translation._y + elem_last.rect.height / 2 + 20;
+    } else {
+        var elem_last = f.data.elements[f.index + n];
+        var x_last = elem_last.rect.translation._x + rectWidth / 2;
+        var y_last = elem_last.rect.translation._y + elem_last.rect.height / 2 + 20;
+    }
 
 
     var line = two.makeLine(x + 10, y, x_last, y);
     line.stroke = color;
     line.fill = color;
 
+    // var x1 = two.makeLine(x, y, x, y + 100);
+    // x1.stroke = "blue";
+
+    // var x2 = two.makeLine(x_last, y, x_last, y + 100);
+    // x2.stroke = "green";
+
+    // var x3 = two.makeLine(elem_last.rect.translation._x, y, elem_last.rect.translation._x, y + 100);
+    // x3.stroke = "red";
 
 
-    // var tri = two.makePolygon(x_last, y_last, pointerTriangleSize)
-    // tri.fill = color;
-    // tri.noStroke();
+    // console.log("-------------------------")
+    // console.log(x)
+    // console.log(x_last)
+    // console.log(elem_last.rect.translation._x)
+    // console.log("-------------------------")
 
     var line2 = two.makeLine(x_last, y, x_last, y - 15);
     line2.stroke = color;
