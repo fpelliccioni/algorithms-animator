@@ -173,6 +173,11 @@ if ( ! equal(it, l)) {
 ,partition_semistable:
 `//Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
 //Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L58
+
+var r = range_bounded("f", "l");
+var r2 = range_bounded("j", "l");
+var r3 = range_bounded("p", "l");
+
 function partition_semistable(f, l, p) {
     while (true) {
         if (equal(f, l)) return f;
@@ -198,14 +203,18 @@ var d = add_sequence(random_array(), "d", even);
 var f = begin(d);
 var l = end(d);
 
-var it = partition_semistable(f, l, even);
-if ( ! equal(it, l)) {
-    print('partition point: ' + source(it));
+var p = partition_semistable(f, l, even);
+if ( ! equal(p, l)) {
+    print('partition point: ' + source(p));
 }`
 
 ,partition_semistable_nonempty:
 `//Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
 //Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L91
+
+var r = range_bounded("f", "l");
+var r2 = range_bounded("j", "l");
+
 function partition_semistable_nonempty(f, l, p) {
     //precondition: nonempty: ! equal(f, l)
     while ( ! p(source(f))) {
@@ -236,7 +245,7 @@ partition_semistable_nonempty(f, l, even);`
 
 
 ,partition_copy:
-`function partition_copy(f, l, r_g, r_b, p) {
+`function partition_copy(f, l, r_b, r_g, p) {
     while ( ! equal(f, l)) {
         if (p(source(f))) {
             sink(r_g, source(f));
@@ -247,21 +256,102 @@ partition_semistable_nonempty(f, l, even);`
         }
         f = successor(f);
     }
-    return [r_g, r_b];
+    return [r_b, r_g];
 }
 
 
 var even = predicate(function(x) {return x % 2 == 0;}, "even");
 var d = add_sequence(random_array(), "d", even);
-var good = add_sequence(new Array(size(d)), "good");
 var bad = add_sequence(new Array(size(d)), "bad");
+var good = add_sequence(new Array(size(d)), "good");
 
-var res = partition_copy(begin(d), end(d), begin(good), begin(bad), even);
+var res = partition_copy(begin(d), end(d), begin(bad), begin(good), even);
 
 var fg = res[0];
 var fb = res[1];
 
 print('...');`
+
+
+
+,partition_stable_with_buffer_0:
+`function partition_copy(f, l, r_b, r_g, p) {
+    while ( ! equal(f, l)) {
+        if (p(source(f))) {
+            sink(r_g, source(f));
+            r_g = successor(r_g);
+        } else {
+            sink(r_b, source(f));
+            r_b = successor(r_b);
+        }
+        f = successor(f);
+    }
+    return [r_b, r_g];
+}
+
+function copy(f, l, o) {
+    while ( ! equal(f, l)) {
+        sink(o, source(f));
+        o = successor(o);
+        f = successor(f);
+    }
+}
+
+function partition_stable_with_buffer_0(f, l, p, b) {
+    var tmp = partition_copy(f, l, f, b, p);
+    var tf = tmp[0];
+    var ts = tmp[1];
+    copy(b, ts, tf);
+    return tf;
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var buf = add_sequence(new Array(size(d)), "buf");
+
+var p = partition_stable_with_buffer_0(begin(d), end(d), even, begin(buf));
+if ( ! equal(p, l)) {
+    print('partition point: ' + source(p));
+}`
+
+
+,partition_stable_forward:
+`//Variation of Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+//Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L58
+
+var r = range_bounded("f", "l");
+var r2 = range_bounded("j", "l");
+var r3 = range_bounded("p", "l");
+
+function partition_stable_forward(f, l, p) {
+    while (true) {
+        if (equal(f, l)) return f;
+        if (p(source(f))) break;
+        f = successor(f);
+    }
+
+    var j = f;
+    j = successor(j)
+
+    while ( ! equal(j, l)) {
+        if ( ! p(source(j))) {
+            rotate(f, j, successor(j));     //TODO: refine rotate(...)
+            f = successor(f);
+        }
+        j = successor(j);
+    }
+    return f;
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var f = begin(d);
+var l = end(d);
+
+var p = partition_stable_forward(f, l, even);
+if ( ! equal(p, l)) {
+    print('partition point: ' + source(p));
+}`
 
 
 
@@ -383,8 +473,7 @@ print(res);`
 
 
 , palindrome_naive:
-`
-function equal_r(f, l, f2, r) {
+`function equal_r(f, l, f2, r) {
     while ( ! equal(f, l)) {
         if ( ! r(source(f), source(f2))) {
             return false;
@@ -425,7 +514,8 @@ if (res) {
 
 
 , palindrome_forward_recursive:
-`function palindrome_forward_recursive(f, n, r) {
+`var r = range_counted("f", "n");
+function palindrome_forward_recursive(f, n, r) {
     if (n == 0) return [true, f];
     if (n == 1) return [true, successor(f)];
 
@@ -1323,6 +1413,9 @@ function find_ranges(scope) {
         var key = keys[x];
         var value = scope.properties[key];
         if (value && value instanceof RangeCounted) {
+            // console.log(value)
+            res.push(value);
+        } else if (value && value instanceof RangeBounded) {
             res.push(value);
         }
     }
@@ -1451,6 +1544,16 @@ function scopePairComparer(a, b) {
     return 1;
 }
 
+// function alert2(n, its_internal) {
+//     var s = "------------- " + n + '\n';
+//     for (var i in its_internal) {
+//         var key = its_internal[i].key;
+//         var value = its_internal[i].value;
+//         s += key + " - " + value.name + "\n";
+//     }
+//     alert(s);
+// }
+
 function drawScope(scope) {
     // console.log(scope.properties);
     prevScopeOrder = scopeOrder(scope);
@@ -1499,17 +1602,38 @@ function drawScope(scope) {
         }
     }
 
+    
+
+    // console.log(keys)
     for (var x in keys) {
         var key = keys[x];
         if ( ! reserved.includes(key)) {
             var value = scope.properties[key];
             if (value && value instanceof Iterator) {
-                its_internal.push({key: key, value: value});
+                // console.log(key)
+                // console.log(value)
+                // console.log(its_internal)
+                its_internal.push({key: key, value: new Iterator(value.data, value.index, value.name)});
+
+                // console.log(its_internal)
             }
         }
     }
 
+    // if (its_internal.length >= 2) {
+    //     console.log("----------- 1")
+    //     console.log(its_internal)
+    //     alert2(1, its_internal)
+    // }
+
     its_internal.sort(scopePairComparer);
+
+    // if (its_internal.length >= 2) {
+    //     console.log("----------- 2")
+    //     console.log(its_internal)
+
+    //     alert2(2, its_internal)
+    // }
 
     for (var i in its_internal) {
         var key = its_internal[i].key;
@@ -1588,17 +1712,29 @@ function drawScope(scope) {
     // }
 
     var itn = 0;
+
+    // if (its_internal.length >= 2) {
+    //     // console.log("----------- 3")
+    //     // console.log(its_internal)
+    //     alert2(3, its_internal)
+    // }
+    
     for (var i in its_internal) {
         var key = its_internal[i].key;
         var value = its_internal[i].value;
 
         if ( ! value.name) {
+            // console.log('********************** 1')
+            // console.log(value);
             value.name = key;
+            // console.log(value);
             iterators_int[key] = value;
             updateStatus();
         }
 
         if (key != value.name) {
+            // console.log('********************** 2')
+            // console.log(value);
             value.name = key;
             iterators_int[key] = value;
             updateStatus();
@@ -1609,6 +1745,12 @@ function drawScope(scope) {
         iterators_gui[value.name] = it_gui;
         ++itn;
     }
+
+    // if (its_internal.length >= 2) {
+    //     // console.log("----------- 3")
+    //     // console.log(its_internal)
+    //     alert2(4, its_internal)
+    // }
 
 
     for (var x in keys) {
@@ -1655,17 +1797,35 @@ function drawScope(scope) {
         addVariable(key, value, seqn);
     }
 
+    // console.log(ranges);
+
     for (var i = 0; i < ranges.length; i++) {
         var r = ranges[i];
 
         if (r instanceof RangeBounded) {
+            // var f = scope.properties[r.fname];
+            // var l = scope.properties[r.lname];
+
+            var f = its_internal.find( x => x.key === r.fname );
+            var l = its_internal.find( x => x.key === r.lname );
+            
+            if (f != undefined && l != undefined) {
+                drawBoundedRange(f.value, l.value);
+            }
 
         } else if (r instanceof RangeCounted) {
-            var f = scope.properties[r.fname];
-            var n = scope.properties[r.nname];
+            // var f = scope.properties[r.fname];
+            // var n = scope.properties[r.nname];
+
+            var f = its_internal.find( x => x.key === r.fname );
+            var n = vars_internal.find( x => x.key === r.nname );
+
+            // console.log(r)
+            // console.log(f)
+            // console.log(n)
 
             if (f != undefined && n != undefined) {
-                drawCounterRange(f, n);
+                drawCountedRange(f.value, n.value);
             }
         }
     }
