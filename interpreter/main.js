@@ -333,7 +333,8 @@ print(m);`
 
 
 ,gcd:
-`function remainder(a, b) {
+`skip_debug('remainder');
+function remainder(a, b) {
     return a % b;
 }
 
@@ -552,6 +553,7 @@ function resetState() {
 
     lines = [];
     prevLine = "";
+    prevLine2 = "";
     prevNodeType = "";
     iterators_int = {};
     iterators_gui = {};
@@ -759,7 +761,7 @@ function initFunctions(interpreter, scope) {
         var max = data.length;
 
         // console.log(it_par.index)
-        if (it_par.index + step >= max) {
+        if (it_par.index + step > max) {
             showError('out of range');
             disable('disabled');
             return;
@@ -781,7 +783,7 @@ function initFunctions(interpreter, scope) {
 
     var predecessor_wrapper = function(it_par, step = 1) {
         // console.log(it_par.index)
-        if (it_par.index - step <= 0) {
+        if (it_par.index - step < 0) {
             showError('out of range');
             disable('disabled');
             return;
@@ -1328,7 +1330,132 @@ function find_ranges(scope) {
 }
 
 
+var prevScopeOrder = [];
+
+function scopeComparer(a, b) {
+    var ai = prevScopeOrder.indexOf(a);
+    var bi = prevScopeOrder.indexOf(b);
+
+    if (ai == -1 && bi == -1) return 0;
+    if (ai == -1 && bi != -1) return 1;
+    if (ai != -1 && bi == -1) return -1;
+
+    // console.log(a)
+    // console.log(b)
+    // console.log(ai)
+    // console.log(bi)
+
+    if (ai < bi) return -1;
+    if (ai == bi) return 0;
+    return 1;
+}
+
+function scopeOrder(scope) {
+
+    var res = [];
+
+    var reserved = ['arguments', 'this', 'undefined', 'NaN', 'Infinity',
+        'Array', 'Boolean','Date', 'Error', 'EvalError', 'Function',
+        'JSON', 'Math', 'Number', 'Object', 'RangeError', 'ReferenceError',
+        'RegExp', 'String', 'SyntaxError', 'TypeError', 'URIError',
+        'eval', 'isFinite', 'isNaN', 'parseFloat', 'parseInt', 'self', 
+        'window',
+        'add_sequence', 'add_sequence_internal', 'alert', 'assign_it',
+        'begin', 'call_predicate', 'call_predicate_internal', 'call_relation',
+        'call_relation_internal', 'copy_it', 'disable_log_stats', 'enable_log_stats',
+        'end',  'equal', 'fill_elem', 'find_if', 'sink', 'source', 'successor', 'remove_it',
+        'print', 'random_array', 'relation', 'iter_swap', 'predecessor', 'predicate'];
+
+    variables = [];
+
+    // var ranges = find_ranges(scope);
+
+
+    // var keys = Object.keys(scope.properties).sort();
+    var keys = Object.keys(scope.properties);
+
+    for (var x in keys) {
+        var key = keys[x];
+        if ( ! reserved.includes(key)) {
+            var value = scope.properties[key];
+            if (value && value instanceof Sequence) {
+                res.push(key);
+            }
+        }
+    }
+
+    for (var x in keys) {
+        var key = keys[x];
+        if ( ! reserved.includes(key)) {
+            var value = scope.properties[key];
+            if (value && value instanceof Iterator) {
+                res.push(key);
+            }
+        }
+    }
+
+    for (var x in keys) {
+        var key = keys[x];
+
+        if ( ! reserved.includes(key)) {
+            var value = scope.properties[key];
+        
+            if (value != undefined) {
+
+                if (value instanceof Sequence) {
+                } else if (value instanceof Iterator) {
+                } else if (value instanceof RangeBounded) {
+                } else if (value instanceof RangeCounted) {
+                } else if (value instanceof Interpreter.Object) {
+                } else {
+                    res.push(key);
+                }
+
+                // if ( ! value.class) {
+                //     addVariable(key, value, seqn);
+                // }
+            } else {
+                // console.log(key);
+                // console.log(value);
+                // addVariable(key, value, seqn);
+            }
+        }
+    }
+
+    // console.log(res);
+    res.sort(scopeComparer);
+
+    return res;
+}
+
+
+function scopePairComparer(a, b) {
+
+    // console.log(a)
+    // console.log(b)
+
+    var ai = prevScopeOrder.indexOf(a.key);
+    var bi = prevScopeOrder.indexOf(b.key);
+
+    if (ai == -1 && bi == -1) return 0;
+    if (ai == -1 && bi != -1) return 1;
+    if (ai != -1 && bi == -1) return -1;
+
+    // console.log(a)
+    // console.log(b)
+    // console.log(ai)
+    // console.log(bi)
+
+    if (ai < bi) return -1;
+    if (ai == bi) return 0;
+    return 1;
+}
+
 function drawScope(scope) {
+    // console.log(scope.properties);
+    prevScopeOrder = scopeOrder(scope);
+    // console.log(prevScopeOrder);
+
 
     var reserved = ['arguments', 'this', 'undefined', 'NaN', 'Infinity',
         'Array', 'Boolean','Date', 'Error', 'EvalError', 'Function',
@@ -1351,12 +1478,16 @@ function drawScope(scope) {
 
     // console.log(two.width);
 
-    var keys = Object.keys(scope.properties).sort();
-    // var keys = Object.keys(scope.properties);
+    // console.log(scope.properties);
+
+    // var keys = Object.keys(scope.properties).sort();
+    var keys = Object.keys(scope.properties);
 
     // First Sequences
 
     var seq_internal = [];
+    var its_internal = [];
+    var vars_internal = [];
 
     for (var x in keys) {
         var key = keys[x];
@@ -1373,17 +1504,45 @@ function drawScope(scope) {
         if ( ! reserved.includes(key)) {
             var value = scope.properties[key];
             if (value && value instanceof Iterator) {
-
-                var found = seq_internal.find(function(x) {
-                    return x.value && x.value.name == value.data.name;
-                });
-
-                if ( ! found) {
-                    seq_internal.push({key: value.data.name, value: value.data});
-                }
+                its_internal.push({key: key, value: value});
             }
         }
     }
+
+    its_internal.sort(scopePairComparer);
+
+    for (var i in its_internal) {
+        var key = its_internal[i].key;
+        var value = its_internal[i].value;
+
+        var found = seq_internal.find(function(x) {
+            return x.value && x.value.name == value.data.name;
+        });
+
+        if ( ! found) {
+            seq_internal.push({key: value.data.name, value: value.data});
+        }
+
+    }
+    // for (var x in keys) {
+    //     var key = keys[x];
+    //     if ( ! reserved.includes(key)) {
+    //         var value = scope.properties[key];
+    //         if (value && value instanceof Iterator) {
+
+    //             var found = seq_internal.find(function(x) {
+    //                 return x.value && x.value.name == value.data.name;
+    //             });
+
+    //             if ( ! found) {
+    //                 seq_internal.push({key: value.data.name, value: value.data});
+    //             }
+    //         }
+    //     }
+    // }
+
+
+    seq_internal.sort(scopePairComparer);
 
     var seqn = 0;
     for (var i in seq_internal) {
@@ -1394,39 +1553,63 @@ function drawScope(scope) {
         ++seqn;
     }
 
+    // var itn = 0;
+    // for (var x in keys) {
+    //     var key = keys[x];
+    //     if ( ! reserved.includes(key)) {
+    //         var value = scope.properties[key];
+    //         if (value && value instanceof Iterator) {
+
+    //             // console.log(key)
+    //             // console.log(value)
+
+    //             if ( ! value.name) {
+    //                 value.name = key;
+    //                 iterators_int[key] = value;
+    //                 updateStatus();
+    //             }
+
+    //             if (key != value.name) {
+    //                 value.name = key;
+    //                 iterators_int[key] = value;
+    //                 updateStatus();
+    //             }
+
+
+    //             // var it = new Iterator(arr, index, null);
+    //             // iterators_int[name] = it;
+
+    //             var color = iterators_colors[itn];
+    //             var it_gui = drawIterator(two, value.data.elements[value.index], key, color);
+    //             iterators_gui[value.name] = it_gui;
+    //             ++itn;
+    //         }
+    //     }
+    // }
+
     var itn = 0;
-    for (var x in keys) {
-        var key = keys[x];
-        if ( ! reserved.includes(key)) {
-            var value = scope.properties[key];
-            if (value && value instanceof Iterator) {
+    for (var i in its_internal) {
+        var key = its_internal[i].key;
+        var value = its_internal[i].value;
 
-                // console.log(key)
-                // console.log(value)
-
-                if ( ! value.name) {
-                    value.name = key;
-                    iterators_int[key] = value;
-                    updateStatus();
-                }
-
-                if (key != value.name) {
-                    value.name = key;
-                    iterators_int[key] = value;
-                    updateStatus();
-                }
-
-
-                // var it = new Iterator(arr, index, null);
-                // iterators_int[name] = it;
-
-                var color = iterators_colors[itn];
-                var it_gui = drawIterator(two, value.data.elements[value.index], key, color);
-                iterators_gui[value.name] = it_gui;
-                ++itn;
-            }
+        if ( ! value.name) {
+            value.name = key;
+            iterators_int[key] = value;
+            updateStatus();
         }
+
+        if (key != value.name) {
+            value.name = key;
+            iterators_int[key] = value;
+            updateStatus();
+        }
+
+        var color = iterators_colors[itn];
+        var it_gui = drawIterator(two, value.data.elements[value.index], key, color);
+        iterators_gui[value.name] = it_gui;
+        ++itn;
     }
+
 
     for (var x in keys) {
         // console.log(x);
@@ -1449,9 +1632,8 @@ function drawScope(scope) {
                 } else if (value instanceof RangeCounted) {
                 } else if (value instanceof Interpreter.Object) {
                 } else {
-                    // console.log(key);
-                    // console.log(value);
-                    addVariable(key, value, seqn);
+                    // addVariable(key, value, seqn);
+                    vars_internal.push({key: key, value: value});
                 }
 
                 // if ( ! value.class) {
@@ -1463,6 +1645,14 @@ function drawScope(scope) {
                 // addVariable(key, value, seqn);
             }
         }
+    }
+
+    vars_internal.sort(scopePairComparer);
+    for (var i in vars_internal) {
+        var key = vars_internal[i].key;
+        var value = vars_internal[i].value;
+
+        addVariable(key, value, seqn);
     }
 
     for (var i = 0; i < ranges.length; i++) {
@@ -1609,6 +1799,10 @@ function stepButton() {
             continue;
         }
 
+        if (prevLine2.includes(codeSelected)) {
+            continue;
+        }
+
         if (node.type == 'Literal') {
             //console.log('continue 5')
             // console.log(node);
@@ -1657,7 +1851,19 @@ function stepButton() {
         // console.log('*********************')
 
 
+        // console.log(codeSelected);
+        // console.log(prevLine);
+
+        prevLine2 = codeSelected;
+
+
         if (node.type == 'CallExpression' && prevNodeType == 'BlockStatement') {
+            prevNodeType = node.type;
+            //console.log('continue 11')
+            continue;
+        }
+
+        if (node.type == 'ReturnStatement' && prevNodeType == 'BlockStatement') {
             prevNodeType = node.type;
             //console.log('continue 11')
             continue;
@@ -1671,7 +1877,6 @@ function stepButton() {
 
 
         prevNodeType = node.type;
-        prevLine = codeSelected;
 
         if (node.type == 'BlockStatement') {
             //console.log('continue 10')
@@ -1679,6 +1884,8 @@ function stepButton() {
             continue;
         }
 
+
+        prevLine = codeSelected;
 
         // console.log('-----------------------------------')
         drawScope(scope);

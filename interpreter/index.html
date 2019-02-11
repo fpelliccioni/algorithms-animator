@@ -145,14 +145,24 @@ var d = add_sequence(random_array(), "d");
             // console.log(document.getElementById('hg-right-a').offsetWidth)
             // console.log(document.getElementById('hg-right-a').offsetHeight)
 
+            var twp_width = document.getElementById('hg-right-a').offsetWidth
+            var two_height = document.getElementById('hg-right-a').offsetHeight
+
+
+            // console.log(twp_width)
+            // console.log(two_height)
+
+
             var two = new Two({
                     fullscreen: false,
                     // width: document.getElementById('sequence').offsetWidth,
                     // height: 600,
-                    width: document.getElementById('hg-right-a').offsetWidth,
-                    height: document.getElementById('hg-right-a').offsetHeight,
+                    width: twp_width,
+                    height: two_height,
                     autostart: true
             }).appendTo(sequence);
+
+            setSizes();
     
             // document.onkeypress = function (e) {
             //     e = e || window.event;
