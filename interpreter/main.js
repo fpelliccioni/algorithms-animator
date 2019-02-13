@@ -870,6 +870,157 @@ print(s);
 rotate_bidirectional(begin(s), successor(begin(s), 3), end(s));
 print(s);
 print('...');`
+
+
+
+,rotate_random_access:
+`function remainder(a, b) {
+    return a % b;
+}
+
+function gcd(a, b) {
+    while (b != 0) {
+        var r = remainder(a, b);
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+function cycle_from(i, f) {
+    var tmp = source(i);
+    var j = i;
+    var k = f(i);
+    while ( ! equal(k, i)) {
+        sink(j, source(k));
+        j = k;
+        k = f(k);
+    }
+    sink(j, tmp);
+}
+
+function rotate_cycles(f, m, l, from) {
+    var d = gcd(distance(f, m), distance(m, l));
+
+    while (d != 0) {
+        --d;
+        cycle_from(successor(f, d), from);
+    }
+    return successor(f, distance(m, l));
+}
+
+function k_rotate_from_permutation_random_access(f, m, l) {
+    var k = distance(m, l);
+    var n_minus_k = distance(f, m);
+    var m_prime = successor(f, distance(m, l));
+
+    return function(x) {
+        if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
+        return predecessor(x, k);
+    };
+}
+
+function rotate_random_access_nontrivial(f, m, l) {
+    var p = k_rotate_from_permutation_random_access(f, m, l);
+    return rotate_cycles(f, m, l, p);
+}
+
+var s = add_sequence(random_array(12), "s");
+print(s);
+rotate_random_access_nontrivial(begin(s), successor(begin(s), 3), end(s));
+print(s);
+print('...');`
+
+
+
+
+
+,insert_naive:
+`function copy_backward(f_i, l_i, l_o) {
+    while ( ! equal(f_i, l_i)) {
+        // copy_backward_step(l_i, l_o);
+        l_i = predecessor(l_i);
+        l_o = predecessor(l_o);
+        sink(l_o, source(l_i));
+    } 
+    return l_o;
+}
+function shift_right_by_one(f, l) {
+    if (equal(f, l)) return;
+    copy_backward(f, predecessor(l), l);
+}
+
+function insert_naive(s, ip, f, l) {
+    var d = distance(begin(s), ip);
+    
+    while ( ! equal(f, l)) {
+        // s = increase_capacity(s, 1)
+        s = push_back(s, 0);
+        ip = successor(begin(s), d)
+        shift_right_by_one(ip, end(s));
+        sink(ip, source(f));
+        f = successor(f);
+        ++d;
+    }
+
+    return s;
+}
+
+var s = add_sequence(random_array(), "s");
+var i = add_sequence(random_array(5), "i");
+
+print(s);
+print(i);
+s = insert_naive(s, begin(s), begin(i), end(i));
+print(s);
+print('...');`
+
+
+
+,insert:
+`function reverse(f, l) {
+    while (true) {
+        if (equal(f, l)) return;
+        l = predecessor(l);
+        if (equal(f, l)) return;
+        iter_swap(f, l);
+        f = successor(f);        
+    }
+}
+
+function rotate(f, m, l) {
+    reverse(f, m);
+    reverse(m, l);
+    reverse(f, l);
+}
+
+function insert(s, ip, f, l) {
+    var d = distance(begin(s), ip);
+    var ld = distance(ip, end(s));
+    
+    while ( ! equal(f, l)) {
+        s = push_back(s, source(f));
+        f = successor(f);
+        ++d;
+    }
+
+    rotate(begin(s), successor(begin(s), ld), end(s));
+
+    return s;
+}
+
+var s = add_sequence(random_array(), "s");
+var i = add_sequence(random_array(5), "i");
+
+print(s);
+print(i);
+s = insert(s, begin(s), begin(i), end(i));
+print(s);
+print('...');`
+
+
+
+
 };
 
 function getSnippet(snippet) {
@@ -901,11 +1052,15 @@ function Iterator(data, index, name) {
     this.name = name;
 }
 
-function Sequence(name, data, elements, colors) {
+function Sequence(name, data, elements, colors, capacity) {
+    if (capacity == undefined) {
+        capacity = data.length
+    }
     this.name = name;
     this.data = data;
     this.elements = elements;
     this.colors = colors;
+    this.capacity = capacity;
 }
 
 function RangeBounded(fname, lname) {
@@ -1237,13 +1392,44 @@ function initFunctions(interpreter, scope) {
         return it;
     };
 
-    var size_wrapper = function(arr, name, color) {
-
+    var size_wrapper = function(arr) {
         var length = arr.data.length
         return length;
+    };
 
-        // updateStatus();
-        // return it;
+    var capacity_wrapper = function(arr) {
+        var c = arr.capacity
+        return c;
+    };
+
+    var increase_capacity_wrapper = function(seq, n) {
+        var retobj = new Sequence(seq.name, seq.data, seq.elements, seq.colors, seq.capacity + n);
+        sequences[seq.name] = retobj;
+        return retobj;
+    };
+
+
+    var push_back_wrapper = function(seq, x) {
+
+        var cap = seq.capacity
+        var data = seq.data;
+
+        console.log(data)
+        console.log(cap)
+
+        if (cap == data.length) {
+            ++cap;
+        }
+
+        data.push(x)
+
+        console.log(data)
+        console.log(cap)
+
+
+        var retobj = new Sequence(seq.name, data, seq.elements, seq.colors, cap);
+        sequences[seq.name] = retobj;
+        return retobj;
     };
 
 
@@ -1253,16 +1439,15 @@ function initFunctions(interpreter, scope) {
         return s;
     };
 
-
     var source_wrapper = function(it) {
         var data = it.data.data;
         var max = data.length;
+
         if (it.index >= max) {
             showError('not valid iterator to take the source.');
             disable('disabled');
             return;
         }
-        
 
         var s = data[it.index];
         addLogSource(it, s)
@@ -1309,6 +1494,17 @@ function initFunctions(interpreter, scope) {
         updateStatus();
         var res = a.index == b.index;
         addLogEqual(a, b, res)
+        return res;
+    };
+
+    var distance_wrapper = function(a, b) {
+        // if (log_stats_enabled) {
+        //     ++stats_it_cmps;
+        // }
+
+        // updateStatus();
+        var res = b.index - a.index;
+        // addLogEqual(a, b, res)
         return res;
     };
 
@@ -1367,7 +1563,7 @@ function initFunctions(interpreter, scope) {
     };
 
 
-    var add_sequence_internal_wrapper = function(data_par, name, paint_pred) {
+    var add_sequence_internal_wrapper = function(data_par, name) {
         // console.log(data_par);
 
         if (sequences[name] != undefined) {
@@ -1482,24 +1678,23 @@ function initFunctions(interpreter, scope) {
     interpreter.setProperty(scope, 'begin',          interpreter.createNativeFunction(begin_wrapper));
     interpreter.setProperty(scope, 'end',            interpreter.createNativeFunction(end_wrapper));
     interpreter.setProperty(scope, 'size',           interpreter.createNativeFunction(size_wrapper));
+    interpreter.setProperty(scope, 'capacity',       interpreter.createNativeFunction(capacity_wrapper));
+    interpreter.setProperty(scope, 'increase_capacity', interpreter.createNativeFunction(increase_capacity_wrapper));
+    interpreter.setProperty(scope, 'push_back', interpreter.createNativeFunction(push_back_wrapper));
     
     interpreter.setProperty(scope, 'source',         interpreter.createNativeFunction(source_wrapper));
     interpreter.setProperty(scope, 'sink',           interpreter.createNativeFunction(sink_wrapper));
     interpreter.setProperty(scope, 'equal',          interpreter.createNativeFunction(equal_wrapper));
-    // interpreter.setProperty(scope, 'copy_it',        interpreter.createNativeFunction(copy_it_wrapper));
-    // interpreter.setProperty(scope, 'remove_it',      interpreter.createNativeFunction(remove_it_wrapper));
+    interpreter.setProperty(scope, 'distance',       interpreter.createNativeFunction(distance_wrapper));
+
     interpreter.setProperty(scope, 'iter_swap',      interpreter.createNativeFunction(iter_swap_wrapper));
-    // interpreter.setProperty(scope, 'assign_it',      interpreter.createNativeFunction(assign_it_wrapper));
     interpreter.setProperty(scope, 'add_sequence_internal',   interpreter.createNativeFunction(add_sequence_internal_wrapper));
-    // interpreter.setProperty(scope, 'set_predicate',  interpreter.createNativeFunction(set_predicate_wrapper));
     interpreter.setProperty(scope, 'fill_elem',      interpreter.createNativeFunction(fill_elem_wrapper));
-    // interpreter.setProperty(scope, 'increment_predicate_stats', interpreter.createNativeFunction(increment_predicate_stats_wrapper));
     interpreter.setProperty(scope, 'call_predicate_internal', interpreter.createNativeFunction(call_predicate_internal_wrapper));
     interpreter.setProperty(scope, 'call_relation_internal', interpreter.createNativeFunction(call_relation_internal_wrapper));
 
     interpreter.setProperty(scope, 'enable_log_stats', interpreter.createNativeFunction(enable_log_stats_wrapper));
     interpreter.setProperty(scope, 'disable_log_stats', interpreter.createNativeFunction(disable_log_stats_wrapper));
- 
     interpreter.setProperty(scope, 'skip_debug', interpreter.createNativeFunction(skip_debug_wrapper));
 
     interpreter.setProperty(scope, 'range_bounded', interpreter.createNativeFunction(range_bounded_wrapper));
@@ -1520,7 +1715,7 @@ function callPredCode() {
 function addSequenceCode() {
     return 'function add_sequence(d, n, p) {' + '\n' +
     '    disable_log_stats();' + '\n' +
-    '    var obj = add_sequence_internal(d, n, p);' + '\n' +
+    '    var obj = add_sequence_internal(d, n);' + '\n' +
     '    //print(obj);' + '\n' +
     '    if ( ! obj) {enable_log_stats(); return obj;}' + '\n' +
     '    if (p) {' + '\n' +    
@@ -1953,7 +2148,7 @@ function drawScope(scope) {
     for (var i in seq_internal) {
         var key = seq_internal[i].key;
         var value = seq_internal[i].value;
-        var elems = drawArray(two, key, seqn, value.data, value.colors);
+        var elems = drawArray(two, key, seqn, value.data, value.colors, value.capacity);
         sequences[value.name].elements = elems;
         ++seqn;
     }

@@ -169,8 +169,17 @@ function drawIterator(two, elem, text, color = '#99ff99') {
 //     // it.group.translation.set(elem.rect.translation._x - it.tri.translation._x, 0);
 // }
 
-function drawArray(two, name, id, arr, colors) {
+function drawArray(two, name, id, arr, colors, capacity) {
     
+    // console.log("drawArray")
+    // console.log(capacity)
+
+    if (capacity == undefined) {
+        capacity = arr.length
+    }
+
+    // console.log(capacity)
+
     var elements = []
 
     var leftMargin = defaultLeftMargin;
@@ -194,7 +203,16 @@ function drawArray(two, name, id, arr, colors) {
         // console.log(value);
     }
 
-    var e_last = drawPastLast(two, leftMargin + rectWidth / 2 + arr.length * rectWidth, topMargin);
+    var cap_len = capacity - arr.length;
+
+    // console.log(cap_len)
+
+    for (let index = 0; index < cap_len; ++index) {
+        var e = drawPastLast(two, leftMargin + rectWidth / 2 + (arr.length + index) * rectWidth, topMargin);
+        elements.push(e)
+    }
+
+    var e_last = drawPastLast(two, leftMargin + rectWidth / 2 + (arr.length + cap_len) * rectWidth, topMargin);
     elements.push(e_last)
 
     two.update();
