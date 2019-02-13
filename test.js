@@ -105,7 +105,7 @@ function drawElement(two, x, y, text, index, color = defaultElementColor) {
     text.family = "Source Code Pro";
     text.size = fontSize
 
-    var group = two.makeGroup(rect, text, textIndex);
+    var group = two.makeGroup(rect, text);//, textIndex);
     // console.log(group.x)
     // return group;
 
