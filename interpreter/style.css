@@ -870,10 +870,19 @@ button:hover {
 }
 
 
-
+.caret {
+    font-family: "Source Code Pro", monospace;
+    font-size: 14pt;
+    /* font-style: italic; */
+    /* font-style: oblique; */
+    /* text-decoration: line-through; */
+    
+    color: #009900;
+}
 
 .nested {
     display: block;
+    padding-left: 20px;
 }
 
 

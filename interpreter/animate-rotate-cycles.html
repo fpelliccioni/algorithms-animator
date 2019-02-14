@@ -1,0 +1,492 @@
+<!-- 
+Copyright Fernando Pelliccioni 2019
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) 
+-->
+
+<!-- <!DOCTYPE html> -->
+<!-- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Algorithms</title>
+
+    <!--[if lt IE 9]><script src="/static/html5.js"></script><![endif]-->
+    <!-- <link href='//fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'> -->
+
+    <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <!-- <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'> -->
+
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./styles/monokai-sublime.css">
+
+    <!-- <link rel="stylesheet" type="text/css" href="/static/style.css?19"/> -->
+    <!-- <link rel="stylesheet alternate" type="text/css" href="/static/highcontrast.css?0" title="High Contrast"/> -->
+    <link rel="shortcut icon" href="/favicon.png"/>
+
+    <script src="highlight.pack.js"></script>
+    <script src="../two.min.js"></script>
+    <script src="../test.js"></script>
+    <script src="main.js"></script>
+    <script src="acorn.js"></script>
+    <script src="interpreter.js"></script>
+
+
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="header-container">
+            <header>
+            <h1 class="title-global">
+                <!-- <a href="/algorithms">Algorithms &#120572;</a>-->
+                <a href="http://componentsprogramming.com/algorithms">al-Khw&#257;rizm&#299; (&#120572;)</a>
+            </h1>
+            <nav>
+                <ul>
+                    <li><a href="http://componentsprogramming.com/algorithms-about/">[About]</a></li>
+                    <li><a href="http://componentsprogramming.com/algorithms-support/">[Support]</a></li>
+                    <li><a href="http://componentsprogramming.com/algorithms-catalog/">[Catalog]</a></li>
+                    <!-- <li><a href="catalog.html">[Catalog]</a></li> -->
+                    <li><a href="http://componentsprogramming.com/">[Components Programming]</a></li>
+                    <!-- <li><a href="http://componentsprogramming.com/algorithms-help/">[Help]</a></li> -->
+                </ul>
+            </nav>
+            </header>
+        </div>
+        <div class="hg">
+            <div class="hg-left">
+                <div class="hg-left-b">
+                    <pre id="codeHighlightPre"><code id="codeHighlight" class="javascript"></code></pre>
+
+<textarea id="codeArea">
+//CODE HERE!
+</textarea>
+    
+</div>
+                <div class="hg-left-c">
+                    <div id="Buttons">
+                        <button id="startButton" onclick="startButton()">Start (Ctrl-F9)</button>
+                        <button id="stepButton" onclick="stepButton()" disabled="disabled">Step (&darr;)</button>
+                        <button id="restartButton" onclick="restartButton()">Restart</button>
+                        <button id="editButton" onclick="editButton()">Edit</button>
+                    </div>​
+                </div>
+
+                <div class="hg-left-d">
+                <!-- <div id="CopyrightDiv"> -->
+                    <p id="CopyrightP">
+                    <a id="Copyright" href="http://componentsprogramming.com/about-me/">Copyright &copy; Fernando Pelliccioni 2019.</a>
+                    </p>
+                <!-- </div>​ -->
+                </div>
+    
+            </div>
+
+            <div class="hg-right">
+                <div id="hg-right-a" class="hg-right-a">
+                    <div id="sequence"></div>                    
+                </div>
+                <div class="hg-right-b">
+                    <div id="hg-right-b-a">
+                        <div id="hg-right-x">
+                            <div id="hg-right-x-a"></div>
+                            <div id="hg-right-x-b"></div>
+                        </div>
+                        <!-- <div id="hg-right-y">
+                            <pre id="outputPre"><code id="output" class="javascript"></code></pre>
+                        </div> -->
+                        <div id="hg-right-y"></div>
+                        </div>
+                        <div id="hg-right-b-b">
+                            <textarea id="hg-right-b-b-data" readonly></textarea>
+                        </div>
+                </div>
+            </div>
+    
+        </div>
+    </div>
+          
+    <script>
+            var lines = [];
+            var prevLine = "";
+            var myInterpreter;
+
+            var iterators_colors = ['#99ff99', '#d80500', '#afafff', '#ffaff7', '#fdffaf'
+                                  , '#affffb', '#ffe2af', '#d0afff', '#e1ffaf', '#ffafb9'];
+
+            var iterators_int = {};
+            var iterators_gui = {};
+            var predicates = [];
+            var sequences = {};
+            var variables = {};
+
+            // var skipped = ['skip_debug'];
+            var skipped = [];
+
+            var stats_it_moves = 0;
+            var stats_it_cmps = 0;
+            var stats_pred_appls = 0;
+            var stats_swaps = 0;
+            var stats_assigments = 0;
+    
+            // console.log(document.getElementById('hg-right-a').offsetWidth)
+            // console.log(document.getElementById('hg-right-a').offsetHeight)
+
+            var twp_width = document.getElementById('hg-right-a').offsetWidth
+            var two_height = document.getElementById('hg-right-a').offsetHeight
+
+
+            // console.log(twp_width)
+            // console.log(two_height)
+
+
+            var two = new Two({
+                    fullscreen: false,
+                    // width: document.getElementById('sequence').offsetWidth,
+                    // height: 600,
+                    width: twp_width,
+                    height: two_height,
+                    autostart: true
+            }).appendTo(sequence);
+
+            setSizes();
+
+
+            document.onkeydown = function (e) {
+                e = e || window.event;
+                    // console.log(e)
+                // console.log(e.keyCode)
+
+                if (e.ctrlKey && e.keyCode == 120) {
+                    if (document.getElementById('stepButton').disabled) {
+                        startButton()
+                    }
+                }
+
+                if ( (e.ctrlKey && e.keyCode == 121) || (e.keyCode == 39)|| (e.keyCode == 40)) {
+                    // if (document.getElementById('stepButton').disabled) {
+                    //     startButton()
+                    // }
+                    if ( ! document.getElementById('stepButton').disabled) {
+                        stepButton();
+                    }
+                }
+
+            };        
+
+
+
+            // var url_string = window.location.href;
+            // var url = new URL(url_string);
+            // var c = url.searchParams.get("code");
+            // // console.log(c);
+
+            // if (c) {
+            //     document.getElementById('codeArea').value = c;
+            // } else {
+
+            //     var snippet = url.searchParams.get("snippet");
+            //     // console.log(snippet)
+            //     if ( ! snippet) {
+            //         snippet = "partition_semistable";
+            //     }
+            //     if (snippet) {
+            //         document.getElementById('codeArea').value = getSnippet(snippet);
+            //     }
+            // }
+
+            editButton();
+            startButton();
+
+
+            //-------------------------------------------------------------------------------------
+
+
+            function drawArray(two, name, id, arr, colors) {
+                
+                var elements = []
+
+                var leftMargin = defaultLeftMargin;
+                var topMargin = defaultTopMargin + id * sequenceTotalHeight;
+
+                if (name) {
+                    name += ":"
+                    var text = two.makeText(name, leftMargin, topMargin +  escale_y(45));
+                    text.family = "Source Code Pro";
+                    text.size = labelFontSize
+                    text.alignment = 'left'
+                    text.fill = '#99ff99';
+                    leftMargin += 14.46 * name.length
+                }
+
+                for (let index = 0; index < arr.length; ++index) {
+                    let value = arr[index];
+                    let color = colors[index];
+                    var e = drawElement(two,  leftMargin + rectWidth / 2 + index * rectWidth, topMargin, value, index, color);
+                    elements.push(e)
+                    // console.log(value);
+                }
+
+                var e_last = drawPastLast(two, leftMargin + rectWidth / 2 + arr.length * rectWidth, topMargin);
+                elements.push(e_last)
+
+                two.update();
+
+                return elements;
+            }
+
+
+
+            var add_sequence_internal_wrapper = function(data_par, name, paint_pred) {
+
+                console.log(data_par)
+
+                if (sequences[name] != undefined) {
+                    showError('sequence "' + name + '" already exists.');
+                    disable('disabled');
+                    return null;
+                }
+
+                var data = [];
+                var colors = [];
+                var length = data_par.length;
+
+                for (let i = 0; i < length; ++i) {
+                    data.push(data_par[i]);
+                    colors.push(defaultElementColor);
+                }
+
+                // var elems = drawArray(two, data, name, Object.keys(sequences).length);
+                // var retobj = new Sequence(name, data, elems, colors);
+
+                var elems = drawArray(two, name, Object.keys(sequences).length, data, colors);
+                sequences[name] = elems;
+
+                two.update();
+                return elems;
+            };    
+
+
+            function add_sequence(d, n, p) {
+                var obj = add_sequence_internal_wrapper(d, n, p);
+                if ( ! obj) {return obj;}
+                if (p) {    
+                    for (var i = 0; i < d.length; ++i) {
+                        var value = d[i];
+                        if ( ! p(value)) {
+                            fill_elem(obj, i, "#ff9191");
+                        }
+                    }
+                }
+                return obj;
+            }
+
+            function random_array(n, from, to) {
+                if ( ! n) n = 10;
+                if ( ! from) from = 0;
+                if ( ! to) to = 99;
+                var res = []; 
+                while (n != 0) { 
+                    var rand = Math.floor(Math.random() * to) + from; 
+                    res.push(rand); 
+                    --n;
+                } 
+                return res; 
+            }
+
+            function remainder(a, b) {
+                return a % b;
+            }
+
+            function gcd(a, b) {
+                while (b != 0) {
+                    var r = remainder(a, b);
+                    a = b;
+                    b = r;
+                }
+                return a;
+            }
+
+            var max_seq_size = 12
+            var group = add_sequence(random_array(max_seq_size), "s1");
+            // var range0_len = Math.floor(Math.random() * 9) + 1; 
+            var range0_len = 3;
+            var range1_len = max_seq_size - range0_len;
+            var speed = 1;
+
+            // console.log(range0_len)
+            // console.log(range1_len)
+
+            if (range0_len < range1_len) {
+                var min_range_len = range0_len;
+                var max_range_len = range1_len;
+                var min_range_from = 0;
+                var min_range_to = range0_len - 1;
+                var max_range_from = range0_len;
+                var max_range_to = 9;
+                var direction = -1 * speed;
+            } else {
+                var min_range_len = range1_len;
+                var max_range_len = range0_len;
+                var min_range_from = range0_len;
+                var min_range_to = 9
+                var max_range_from = 0;
+                var max_range_to = range0_len - 1;;
+                var direction = 1 * speed;
+            }
+
+            // console.log(min_range_from)
+            // console.log(min_range_to)
+            // console.log(max_range_from)
+            // console.log(max_range_to)
+
+
+            var step = 0;
+
+            var cloned = []
+
+            // for (let index = min_range_from; index <= min_range_to; index++) {
+            for (let index = 0; index <= max_seq_size; index++) {
+                const elem = group[index].group;
+                var nelem = elem.clone();
+                cloned.push(nelem);
+            }
+            two.update();
+
+
+
+            var cycles = gcd(range0_len, range1_len);
+            // console.log(cycles);
+            // console.log(range0_len);
+            // console.log(range1_len);
+            var cycle = 0;
+
+            // while (d != 0) {
+            //     --d;
+            //     cycle_from(successor(f, d), from);
+            // }
+
+            var idx = min_range_from + cycle;
+
+            two.bind('update', function(frameCount) {
+
+                if (step == 0) {
+                    if (cloned[idx].translation._y < rectHeight * 2.4) {
+                        const elem = cloned[idx];
+                        elem.translation.set(elem.translation._x, elem.translation._y + speed);
+                    } else {
+                        step = 1;
+                        // var n_minus_k = distance(f, m);
+                        idx += range0_len
+                    }
+
+                } else if (step == 1) {
+                    if (cloned[idx].translation._y < rectHeight * 1.2) {
+                        const elem = cloned[idx];
+                        elem.translation.set(elem.translation._x, elem.translation._y + speed);
+                    } else {
+                        step = 2;
+                    }
+                } else if (step == 2) {
+                    if (Math.abs(cloned[idx].translation._x) < rectWidth * min_range_len) {
+                        const elem = cloned[idx];
+                        elem.translation.set(elem.translation._x + direction, elem.translation._y);
+                    } else {
+                        step = 3;
+                    }
+                
+                } else if (step == 3) {
+                    if (cloned[idx].translation._y > 0) {
+                        const elem = cloned[idx];
+                        elem.translation.set(elem.translation._x, elem.translation._y - speed);
+                    } else {
+                        idx += range0_len
+                        step = 1;
+                    }
+                }
+
+
+                // else if (step == 1) {
+
+                    
+                //     if (Math.abs(group[max_range_from].group.translation._x) < rectWidth * min_range_len) {
+
+                //         for (let index = max_range_from; index <= max_range_to; index++) {
+                //             const elem = group[index].group;
+                //             elem.translation.set(elem.translation._x + direction, elem.translation._y);
+                //         }
+
+
+                //         // group[max_range_from].group.translation.set(group[max_range_from].group.translation._x + 1, group[max_range_from].group.translation._y);
+                //         // elem4.translation.set(elem4.translation._x + 1, elem4.translation._y);
+                //         // elem5.translation.set(elem5.translation._x + 1, elem5.translation._y);
+                //         // elem6.translation.set(elem6.translation._x + 1, elem6.translation._y);
+                //     }
+
+                //     if (Math.abs(group[min_range_from].group.translation._x) < rectWidth * max_range_len) {
+                //         for (let index = min_range_from; index <= min_range_to; index++) {
+                //             const elem = group[index].group;
+                //             elem.translation.set(elem.translation._x - direction, elem.translation._y);
+                //         }
+                //     } else {
+                //         step = 2;   
+                //     }
+
+
+                //     // if (group[min_range_from].group.translation._x >  rectWidth * -4) {
+                //     //     group[min_range_from].group.translation.set(group[min_range_from].group.translation._x - 1, group[min_range_from].group.translation._y);
+                //     //     elem8.translation.set(elem8.translation._x - 1, elem8.translation._y);
+                //     //     elem9.translation.set(elem9.translation._x - 1, elem9.translation._y);
+                //     // } else {
+                //     //     step = 2;
+                //     // }
+                
+                // } else if (step == 2) {
+                //     if (group[min_range_from].group.translation._y > 0) {
+
+                //         for (let index = min_range_from; index <= min_range_to; index++) {
+                //             const elem = group[index].group;
+                //             elem.translation.set(elem.translation._x, elem.translation._y - speed);
+                //         }
+
+                //         // group[min_range_from].group.translation.set(group[min_range_from].group.translation._x, group[min_range_from].group.translation._y - 1);
+                //         // elem8.translation.set(elem8.translation._x, elem8.translation._y - 1);
+                //         // elem9.translation.set(elem9.translation._x, elem9.translation._y - 1);
+                //     } else {
+                //         step = 3;
+                //     }
+                // }
+
+
+
+
+                // This code is called everytime two.update() is called.
+                // Effectively 60 times per second.
+                // console.log(frameCount);
+
+                // var elem = group[4].group;
+
+                // if (elem.scale > 0.9999) {
+                //     elem.scale = elem.rotation = 0;
+                // }
+                // var t = (1 - elem.scale) * 0.125;
+                // elem.scale += t;
+                // elem.rotation += t * 4 * Math.PI;
+
+                // elem.rotation += Math.PI / 60;
+
+
+
+            }).play();  // Finally, start the animation loop
+
+            //-------------------------------------------------------------------------------------
+
+
+        </script>      
+</body>
+</html>
+
+
