@@ -7,10 +7,67 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 var log_stats_enabled = true;
 
+
+var snippets_cat = {
+      find_if: null
+    , find_backward_if: null
+    , iota: null
+
+    , gcd: null
+    , equal: null 
+    , swap_ranges: null
+    , swap_ranges_bounded: null
+    , swap_ranges_n: null
+
+    , reverse_n_indexed: 'rearrangements-position-based-reverse'
+    , reverse_bidirectional: 'rearrangements-position-based-reverse'
+    , reverse_n_forward: 'rearrangements-position-based-reverse'
+    , reverse_copy: 'rearrangements-position-based-reverse'
+    , reverse_n_with_buffer: 'rearrangements-position-based-reverse'
+    , reverse_n_adaptive: 'rearrangements-position-based-reverse'
+    , rotate_bidirectional: 'rearrangements-position-based-rotate'
+    , rotate_random_access: 'rearrangements-position-based-rotate'
+
+    , partition_semistable_1: 'rearrangements-predicate-based-partition'
+    , partition_semistable: 'rearrangements-predicate-based-partition'
+    , partition_semistable_nonempty: 'rearrangements-predicate-based-partition'
+    , partition_copy: 'rearrangements-predicate-based-partition'
+    , partition_stable_with_buffer_0: 'rearrangements-predicate-based-partition'
+    , partition_stable_forward: 'rearrangements-predicate-based-partition'
+    , partition_point_n: 'rearrangements-predicate-based-partition'
+
+    , max_element: 'selection'
+    , min_element: 'selection'
+    , select_1_3: 'selection'
+
+    , insert_naive: null
+    , insert: null
+
+    , palindrome_naive: null
+    , palindrome_forward_recursive: null
+    , palindrome_bidirectional: null
+};
+    
+
+var categories = [
+    {id: 'rearrangements', name: 'Rearrangements', categories: [
+        {id: 'rearrangements-position-based', name: 'Position-based', categories: [
+              {id: 'rearrangements-position-based-reverse', name: 'Reverse', categories: []}
+            , {id: 'rearrangements-position-based-rotate', name: 'Rotate', categories: []}      
+        ]}
+      , {id: 'rearrangements-predicate-based', name: 'Predicate-based', categories: [
+            {id: 'rearrangements-predicate-based-partition', name: 'Partition', categories: []}          
+        ]}
+          
+      , {id: 'rearrangements-ordering-based', name: 'Ordering-based', categories: []}
+    ]}
+  , {id: 'selection', name: 'Selection', categories: []}
+];
+
+
 var snippets = {
 
-
-find_if: 
+    find_if: 
 `function find_if(f, l, p) {
     while ( ! equal(f, l) && ! p(source(f))) {
         f = successor(f)
@@ -874,7 +931,11 @@ print('...');`
 
 
 ,rotate_random_access:
-`function remainder(a, b) {
+`skip_debug("k_rotate_from_permutation_random_access");
+skip_debug("remainder");
+skip_debug("gcd");
+
+function remainder(a, b) {
     return a % b;
 }
 
@@ -1018,9 +1079,6 @@ s = insert(s, begin(s), begin(i), end(i));
 print(s);
 print('...');`
 
-
-
-
 };
 
 function getSnippet(snippet) {
@@ -1031,19 +1089,92 @@ function getSnippet(snippet) {
     return '';
 }
 
-function fillCatalog() {
-    var list = document.getElementById('list');
-    list.innerHTML = '';
 
-    // for(var key in Object.keys(snippets)){
-    for(var key in snippets){
-        // var value = snippets[key];
-        // console.log(key)
-        // console.log(value)
-    
-        list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
-        // list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + key + '">[' + key + ']</a></li>';
+function catHasChilds(cat) {
+    if (cat.categories == undefined) return false;
+    if (cat.categories == null) return false;
+    return cat.categories.length > 0;
+}
+
+function getSnippets(cat) {
+    var sns = []
+    for(var key in snippets_cat){
+        var value = snippets_cat[key];
+        if (cat.id == value) {
+            sns.push(key)
+        }
     }
+    return sns;
+}
+
+function getUncataloguedSnippets() {
+    var sns = []
+    for(var key in snippets_cat){
+        var value = snippets_cat[key];
+
+        if (value == null) {
+            sns.push(key)
+        }
+    }
+    return sns;
+}
+
+function fillCatalogRecursive(str, categories) {
+
+    if (categories == undefined) return;
+    if (categories == null) return;
+
+    for(var i in categories) {
+        var cat = categories[i];
+       
+        str += '<li class="linested"><span class="caret">' + cat.name + '</span><ul class="nested">';
+        if (catHasChilds(cat)) {
+            str = fillCatalogRecursive(str, cat.categories);
+        } else {
+            snippets = getSnippets(cat);
+            for(var si in snippets) {
+                var s = snippets[si]
+                str += '<li><a href="index.html?snippet=' + s + '">[' + s + ']</a></li>';
+                // str += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + s + '">[' + s + ']</a></li>';
+            }
+        }
+        
+        str +=  '</ul></li>';
+    }
+
+    return str;
+}
+
+function fillCatalog() {
+
+    var str = fillCatalogRecursive('', categories);
+
+    str += '<li class="linested"><span class="caret">' + 'Uncatalogued' + '</span><ul class="nested">';
+
+    snippets = getUncataloguedSnippets();
+    for(var si in snippets) {
+        var s = snippets[si]
+        str += '<li><a href="index.html?snippet=' + s + '">[' + s + ']</a></li>';
+        // str += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + s + '">[' + s + ']</a></li>';
+    }
+    str +=  '</ul></li>';
+
+    var list = document.getElementById('list');
+    list.innerHTML = str;
+
+
+    
+
+
+    // // for(var key in Object.keys(snippets)){
+    // for(var key in snippets){
+    //     // var value = snippets[key];
+    //     // console.log(key)
+    //     // console.log(value)
+    
+    //     list.innerHTML += '<li><a href="index.html?snippet=' + key + '">[' + key + ']</a></li>';
+    //     // list.innerHTML += '<li><a href="http://componentsprogramming.com/algorithms?snippet=' + key + '">[' + key + ']</a></li>';
+    // }
 }
 
 function Iterator(data, index, name) {
@@ -1081,9 +1212,12 @@ function resetState() {
 
 
     lines = [];
+
     prevLine = "";
     prevLine2 = "";
     prevNodeType = "";
+    prevNode = null;
+
     iterators_int = {};
     iterators_gui = {};
     predicates = [];
@@ -2336,6 +2470,8 @@ function stepButton() {
 
 
     while (true) {
+
+
         // console.log(myInterpreter)
         // console.log(myInterpreter.stateStack)
 
@@ -2397,6 +2533,9 @@ function stepButton() {
         codeHighlight.innerHTML = codeHtml;
         hljs.highlightBlock(codeHighlight);
 
+
+
+        // console.log(node);
 
 
         if (codeSelected.length == 1) {
@@ -2521,7 +2660,20 @@ function stepButton() {
         }
 
 
+        if (prevNode != null && prevNode.type == 'VariableDeclaration') {
+            if (prevNode.declarations[0].init.callee && prevNode.declarations[0].init.callee.name == "source") {
+                if (log_stats_enabled) {
+                    ++stats_assigments;
+                    updateStatus();
+                }
+            }
+        }
+
+
         prevLine = codeSelected;
+        prevNode = node;
+
+        
 
         // console.log('-----------------------------------')
         drawScope(scope);

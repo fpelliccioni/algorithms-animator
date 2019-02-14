@@ -166,7 +166,7 @@ header nav li {
   padding: 0 .6em;
 }
 header nav a {
-  display: inline-block;
+  /* display: inline-block; */
   text-decoration: none;
   outline: none;
 }
@@ -872,6 +872,23 @@ button:hover {
 
 
 
+.nested {
+    display: block;
+}
+
+
+.linested {
+    display: block;
+}
+
+
+#list {
+    list-style-type: none;
+    display: block;
+}
+
+
+
 ::-webkit-scrollbar {
     display: none;
 }
@@ -897,4 +914,7 @@ Sergio Daniel Xalambrí [5:35 PM]
 :point_up:
 la otra opción es poner `overflow-y: auto` para que tenga su propio scroll
 si el contenido supera el alto del contenedor */
+
+
+
 
