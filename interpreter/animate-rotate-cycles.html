@@ -310,33 +310,40 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 return a;
             }
 
-            var max_seq_size = 12
-            var group = add_sequence(random_array(max_seq_size), "s1");
+            var n = Math.floor(Math.random() * 20) + 1;
+            var k = Math.floor(Math.random() * n) + 1;
+
+            console.log(n)
+            console.log(k)
+
+            var group = add_sequence(random_array(n), "s1");
             // var range0_len = Math.floor(Math.random() * 9) + 1; 
-            var range0_len = 3;
-            var range1_len = max_seq_size - range0_len;
-            var speed = 1;
+            var range0_len = k;
+            var range1_len = n - k;
+            var speed = 2;
 
             // console.log(range0_len)
             // console.log(range1_len)
 
-            if (range0_len < range1_len) {
-                var min_range_len = range0_len;
-                var max_range_len = range1_len;
-                var min_range_from = 0;
-                var min_range_to = range0_len - 1;
-                var max_range_from = range0_len;
-                var max_range_to = 9;
-                var direction = -1 * speed;
-            } else {
-                var min_range_len = range1_len;
-                var max_range_len = range0_len;
-                var min_range_from = range0_len;
-                var min_range_to = 9
-                var max_range_from = 0;
-                var max_range_to = range0_len - 1;;
-                var direction = 1 * speed;
-            }
+            // if (range0_len < range1_len) {
+            //     var min_range_len = range0_len;
+            //     var max_range_len = range1_len;
+            //     var min_range_from = 0;
+            //     var min_range_to = range0_len - 1;
+            //     var max_range_from = range0_len;
+            //     var max_range_to = 9;
+            //     var direction = -1 * speed;
+            // } else {
+            //     var min_range_len = range1_len;
+            //     var max_range_len = range0_len;
+            //     var min_range_from = range0_len;
+            //     var min_range_to = 9
+            //     var max_range_from = 0;
+            //     var max_range_to = range0_len - 1;;
+            //     var direction = 1 * speed;
+            // }
+
+            var direction = -1 * speed;
 
             // console.log(min_range_from)
             // console.log(min_range_to)
@@ -349,7 +356,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             var cloned = []
 
             // for (let index = min_range_from; index <= min_range_to; index++) {
-            for (let index = 0; index <= max_seq_size; index++) {
+            for (let index = 0; index <= n; index++) {
                 const elem = group[index].group;
                 var nelem = elem.clone();
                 cloned.push(nelem);
@@ -364,16 +371,12 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             // console.log(range1_len);
             var cycle = 0;
 
-            // while (d != 0) {
-            //     --d;
-            //     cycle_from(successor(f, d), from);
-            // }
-
-            var idx = min_range_from + cycle;
+            var idx = cycle;
 
             two.bind('update', function(frameCount) {
 
                 if (step == 0) {
+                    // console.log(idx);
                     if (cloned[idx].translation._y < rectHeight * 2.4) {
                         const elem = cloned[idx];
                         elem.translation.set(elem.translation._x, elem.translation._y + speed);
@@ -384,6 +387,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                     }
 
                 } else if (step == 1) {
+                    // console.log(idx);
                     if (cloned[idx].translation._y < rectHeight * 1.2) {
                         const elem = cloned[idx];
                         elem.translation.set(elem.translation._x, elem.translation._y + speed);
@@ -391,7 +395,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                         step = 2;
                     }
                 } else if (step == 2) {
-                    if (Math.abs(cloned[idx].translation._x) < rectWidth * min_range_len) {
+                    if (Math.abs(cloned[idx].translation._x) < rectWidth * k) {
                         const elem = cloned[idx];
                         elem.translation.set(elem.translation._x + direction, elem.translation._y);
                     } else {
@@ -403,80 +407,45 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                         const elem = cloned[idx];
                         elem.translation.set(elem.translation._x, elem.translation._y - speed);
                     } else {
-                        idx += range0_len
-                        step = 1;
+                        var tidx = idx + range0_len
+                        tidx = tidx % (range0_len + range1_len)
+
+                        if (tidx ==  cycle) {
+                            step = 4;
+                        } else {
+                            step = 1;
+                            idx = tidx
+                        }
+                    }
+                } else if (step == 4) {
+                    var tidx = cycle;
+                    var xxx = idx - tidx;
+                    // console.log('-----------------')
+                    // console.log(idx)
+                    // console.log(tidx)
+                    // console.log(xxx)
+                    if (Math.abs(cloned[tidx].translation._x) < rectWidth * xxx) {
+                        const elem = cloned[tidx];
+                        elem.translation.set(elem.translation._x - (direction * 2), elem.translation._y);
+                    } else {
+                        step = 5;
+                    }
+                } else if (step == 5) {
+                    var tidx =  cycle;
+                    if (cloned[tidx].translation._y > 0) {
+                        const elem = cloned[tidx];
+                        elem.translation.set(elem.translation._x, elem.translation._y - speed);
+                    } else {
+                        ++cycle;
+                        if (cycle < cycles) {
+                            idx =  cycle;
+                            step = 0;
+                        } else {
+                            step = 7;
+                        }
+                        // idx += range0_len
                     }
                 }
-
-
-                // else if (step == 1) {
-
-                    
-                //     if (Math.abs(group[max_range_from].group.translation._x) < rectWidth * min_range_len) {
-
-                //         for (let index = max_range_from; index <= max_range_to; index++) {
-                //             const elem = group[index].group;
-                //             elem.translation.set(elem.translation._x + direction, elem.translation._y);
-                //         }
-
-
-                //         // group[max_range_from].group.translation.set(group[max_range_from].group.translation._x + 1, group[max_range_from].group.translation._y);
-                //         // elem4.translation.set(elem4.translation._x + 1, elem4.translation._y);
-                //         // elem5.translation.set(elem5.translation._x + 1, elem5.translation._y);
-                //         // elem6.translation.set(elem6.translation._x + 1, elem6.translation._y);
-                //     }
-
-                //     if (Math.abs(group[min_range_from].group.translation._x) < rectWidth * max_range_len) {
-                //         for (let index = min_range_from; index <= min_range_to; index++) {
-                //             const elem = group[index].group;
-                //             elem.translation.set(elem.translation._x - direction, elem.translation._y);
-                //         }
-                //     } else {
-                //         step = 2;   
-                //     }
-
-
-                //     // if (group[min_range_from].group.translation._x >  rectWidth * -4) {
-                //     //     group[min_range_from].group.translation.set(group[min_range_from].group.translation._x - 1, group[min_range_from].group.translation._y);
-                //     //     elem8.translation.set(elem8.translation._x - 1, elem8.translation._y);
-                //     //     elem9.translation.set(elem9.translation._x - 1, elem9.translation._y);
-                //     // } else {
-                //     //     step = 2;
-                //     // }
-                
-                // } else if (step == 2) {
-                //     if (group[min_range_from].group.translation._y > 0) {
-
-                //         for (let index = min_range_from; index <= min_range_to; index++) {
-                //             const elem = group[index].group;
-                //             elem.translation.set(elem.translation._x, elem.translation._y - speed);
-                //         }
-
-                //         // group[min_range_from].group.translation.set(group[min_range_from].group.translation._x, group[min_range_from].group.translation._y - 1);
-                //         // elem8.translation.set(elem8.translation._x, elem8.translation._y - 1);
-                //         // elem9.translation.set(elem9.translation._x, elem9.translation._y - 1);
-                //     } else {
-                //         step = 3;
-                //     }
-                // }
-
-
-
-
-                // This code is called everytime two.update() is called.
-                // Effectively 60 times per second.
-                // console.log(frameCount);
-
-                // var elem = group[4].group;
-
-                // if (elem.scale > 0.9999) {
-                //     elem.scale = elem.rotation = 0;
-                // }
-                // var t = (1 - elem.scale) * 0.125;
-                // elem.scale += t;
-                // elem.rotation += t * 4 * Math.PI;
-
-                // elem.rotation += Math.PI / 60;
 
 
 
