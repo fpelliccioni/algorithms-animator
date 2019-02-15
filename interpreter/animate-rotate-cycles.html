@@ -117,6 +117,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             var iterators_colors = ['#99ff99', '#d80500', '#afafff', '#ffaff7', '#fdffaf'
                                   , '#affffb', '#ffe2af', '#d0afff', '#e1ffaf', '#ffafb9'];
 
+            var cycle_colors = ['#afafff', '#ffaff7', '#fdffaf'
+                                 , '#affffb', '#ffe2af', '#d0afff', '#e1ffaf', '#ffafb9'];
+
+
             var iterators_int = {};
             var iterators_gui = {};
             var predicates = [];
@@ -269,6 +273,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 return elems;
             };    
 
+            // var begin_wrapper = function(arr, name, color) {
+            //     var index = 0
+            //     var it = new Iterator(arr, index, null);
+
+            //     var it_gui = drawIterator(two, sequences["s1"][it.index], name);
+
+            //     return it;
+            // };
 
             function add_sequence(d, n, p) {
                 var obj = add_sequence_internal_wrapper(d, n, p);
@@ -310,53 +322,69 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 return a;
             }
 
-            var n = Math.floor(Math.random() * 20) + 1;
-            var k = Math.floor(Math.random() * n) + 1;
+            function k_rotate_from_permutation(f_index, k_par, n_minus_k_par) {
+                var k = k_par;  // distance(m, l);
+                var n_minus_k = n_minus_k_par;  //distance(f, m);
+                var m_prime = f_index + k;      //successor(f, distance(m, l));
 
-            console.log(n)
-            console.log(k)
+                return function(x) {
+                    //if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
+                    //return predecessor(x, k);
+
+                    if (x < m_prime) return x + n_minus_k;
+                    return x - k;
+                };
+            }
+
+
+            function paint_cycle(cycle, fun, cloned, group, color) {
+
+                var idx = cycle;
+
+                var c0 = cloned[idx]
+                var c1 = group[idx].group;
+                c0.children[0].fill = color
+                c1.children[0].fill = color
+
+                idx = fun(idx);
+
+                while (idx != cycle) {
+                    var c0 = cloned[idx]
+                    var c1 = group[idx].group;
+                    c0.children[0].fill = color
+                    c1.children[0].fill = color
+                    idx = fun(idx);
+                }
+
+                // two.update();
+
+            }
+
+
+            // var n = Math.floor(Math.random() * 20) + 2;
+            // var k = Math.floor(Math.random() * (n - 1)) + 1;
+            var n = 12;
+            var k = 6;
+            var n_minus_k = n - k;
+
+            // console.log(n)
+            // console.log(k)
+            // console.log(n_minus_k)
 
             var group = add_sequence(random_array(n), "s1");
-            // var range0_len = Math.floor(Math.random() * 9) + 1; 
-            var range0_len = k;
-            var range1_len = n - k;
+            var f = drawIterator(two, sequences["s1"][0], "f");
+            var m = drawIterator(two, sequences["s1"][n_minus_k], "m", "#afafff");
+            var l = drawIterator(two, sequences["s1"][n], "l", "#d80500");
+
+
+            var fun = k_rotate_from_permutation(0, k, n_minus_k);
+
+
             var speed = 2;
-
-            // console.log(range0_len)
-            // console.log(range1_len)
-
-            // if (range0_len < range1_len) {
-            //     var min_range_len = range0_len;
-            //     var max_range_len = range1_len;
-            //     var min_range_from = 0;
-            //     var min_range_to = range0_len - 1;
-            //     var max_range_from = range0_len;
-            //     var max_range_to = 9;
-            //     var direction = -1 * speed;
-            // } else {
-            //     var min_range_len = range1_len;
-            //     var max_range_len = range0_len;
-            //     var min_range_from = range0_len;
-            //     var min_range_to = 9
-            //     var max_range_from = 0;
-            //     var max_range_to = range0_len - 1;;
-            //     var direction = 1 * speed;
-            // }
-
             var direction = -1 * speed;
 
-            // console.log(min_range_from)
-            // console.log(min_range_to)
-            // console.log(max_range_from)
-            // console.log(max_range_to)
-
-
-            var step = 0;
-
             var cloned = []
-
-            // for (let index = min_range_from; index <= min_range_to; index++) {
-            for (let index = 0; index <= n; index++) {
+            for (let index = 0; index < n; index++) {
                 const elem = group[index].group;
                 var nelem = elem.clone();
                 cloned.push(nelem);
@@ -364,86 +392,119 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             two.update();
 
 
+            var colors = []
 
-            var cycles = gcd(range0_len, range1_len);
-            // console.log(cycles);
-            // console.log(range0_len);
-            // console.log(range1_len);
+
+            var cycles = gcd(k, n_minus_k);
+            console.log(cycles);
             var cycle = 0;
 
-            var idx = cycle;
+
+            for (let index = 0; index < cycles; index++) {
+                var color = cycle_colors[index]
+                paint_cycle(index, fun, cloned, group, color); //"#d80500"
+            }    
+            two.update();        
+
+            var i_idx = cycle;
+            var j_idx = i_idx;
+            var k_idx = fun(i_idx);
+            var step = 0;
+
+
+            // console.log(i_idx)
+            // console.log(j_idx)
+            // console.log(k_idx)
+           
 
             two.bind('update', function(frameCount) {
 
+                // var tmp = source(i);
                 if (step == 0) {
-                    // console.log(idx);
-                    if (cloned[idx].translation._y < rectHeight * 2.4) {
-                        const elem = cloned[idx];
+                    if (cloned[j_idx].translation._y < rectHeight * 2.4) {
+                        const elem = cloned[j_idx];
                         elem.translation.set(elem.translation._x, elem.translation._y + speed);
                     } else {
                         step = 1;
-                        // var n_minus_k = distance(f, m);
-                        idx += range0_len
+                        // j_idx += k
                     }
 
                 } else if (step == 1) {
-                    // console.log(idx);
-                    if (cloned[idx].translation._y < rectHeight * 1.2) {
-                        const elem = cloned[idx];
+                    // sink(j, source(k));   -- part1
+                    if (cloned[k_idx].translation._y < rectHeight * 1.2) {
+                        const elem = cloned[k_idx];
                         elem.translation.set(elem.translation._x, elem.translation._y + speed);
                     } else {
                         step = 2;
                     }
+
                 } else if (step == 2) {
-                    if (Math.abs(cloned[idx].translation._x) < rectWidth * k) {
-                        const elem = cloned[idx];
-                        elem.translation.set(elem.translation._x + direction, elem.translation._y);
+                    // sink(j, source(k));   -- part2
+
+                    if (k_idx > j_idx) {
+                        if (Math.abs(cloned[k_idx].translation._x) < rectWidth * (k_idx - j_idx)) {
+                            const elem = cloned[k_idx];
+                            elem.translation.set(elem.translation._x + direction, elem.translation._y);
+                        } else {
+                            step = 3;
+                        }
+
                     } else {
-                        step = 3;
+
+                        if (Math.abs(cloned[k_idx].translation._x) < rectWidth * (j_idx - k_idx)) {
+                            const elem = cloned[k_idx];
+                            elem.translation.set(elem.translation._x - direction, elem.translation._y);
+                        } else {
+                            step = 3;
+                        }
+
+
                     }
-                
+
+
+
                 } else if (step == 3) {
-                    if (cloned[idx].translation._y > 0) {
-                        const elem = cloned[idx];
+                    // sink(j, source(k));   -- part3
+                    if (cloned[k_idx].translation._y > 0) {
+                        const elem = cloned[k_idx];
                         elem.translation.set(elem.translation._x, elem.translation._y - speed);
                     } else {
-                        var tidx = idx + range0_len
-                        tidx = tidx % (range0_len + range1_len)
+                        j_idx = k_idx
+                        k_idx = fun(k_idx);
 
-                        if (tidx ==  cycle) {
+                        if (k_idx == cycle) {
                             step = 4;
                         } else {
                             step = 1;
-                            idx = tidx
                         }
                     }
                 } else if (step == 4) {
-                    var tidx = cycle;
-                    var xxx = idx - tidx;
-                    // console.log('-----------------')
-                    // console.log(idx)
-                    // console.log(tidx)
-                    // console.log(xxx)
-                    if (Math.abs(cloned[tidx].translation._x) < rectWidth * xxx) {
-                        const elem = cloned[tidx];
-                        elem.translation.set(elem.translation._x - (direction * 2), elem.translation._y);
+                    var tj_idx = cycle;
+                    var xxx = j_idx - tj_idx;
+                    if (Math.abs(cloned[tj_idx].translation._x) < rectWidth * xxx) {
+                        const elem = cloned[tj_idx];
+                        elem.translation.set(elem.translation._x - (direction), elem.translation._y);
                     } else {
                         step = 5;
                     }
                 } else if (step == 5) {
-                    var tidx =  cycle;
-                    if (cloned[tidx].translation._y > 0) {
-                        const elem = cloned[tidx];
+                    var tj_idx =  cycle;
+                    if (cloned[tj_idx].translation._y > 0) {
+                        const elem = cloned[tj_idx];
                         elem.translation.set(elem.translation._x, elem.translation._y - speed);
                     } else {
                         ++cycle;
                         if (cycle < cycles) {
-                            idx =  cycle;
+                            // j_idx =  cycle;
+
+                            i_idx = cycle;
+                            j_idx = i_idx;
+                            k_idx = fun(i_idx);
+
                             step = 0;
                         } else {
                             step = 7;
                         }
-                        // idx += range0_len
                     }
                 }
 

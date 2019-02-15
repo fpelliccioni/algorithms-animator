@@ -931,7 +931,7 @@ print('...');`
 
 
 ,rotate_random_access:
-`skip_debug("k_rotate_from_permutation_random_access");
+`//skip_debug("k_rotate_from_permutation_random_access");
 skip_debug("remainder");
 skip_debug("gcd");
 
@@ -986,9 +986,9 @@ function rotate_random_access_nontrivial(f, m, l) {
     return rotate_cycles(f, m, l, p);
 }
 
-var s = add_sequence(random_array(12), "s");
+var s = add_sequence(random_array(16), "s");
 print(s);
-rotate_random_access_nontrivial(begin(s), successor(begin(s), 3), end(s));
+rotate_random_access_nontrivial(begin(s), successor(begin(s), 6), end(s));
 print(s);
 print('...');`
 
