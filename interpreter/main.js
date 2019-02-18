@@ -33,7 +33,9 @@ var snippets_cat = {
     , partition_semistable_nonempty: 'rearrangements-predicate-based-partition'
     , partition_copy: 'rearrangements-predicate-based-partition'
     , partition_stable_with_buffer_0: 'rearrangements-predicate-based-partition'
-    , partition_stable_forward: 'rearrangements-predicate-based-partition'
+    , partition_stable_forward_slow: 'rearrangements-predicate-based-partition'
+    , partition_stable_inplace_n: 'rearrangements-predicate-based-partition'
+    
     , partition_point_n: 'rearrangements-predicate-based-partition'
 
     , max_element: 'selection'
@@ -372,13 +374,74 @@ if ( ! equal(p, l)) {
 }`
 
 
-,partition_stable_forward:
+,partition_stable_forward_slow:
 `//Variation of Nico Lomutos's partition algorithm: https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
 //Code taken from: https://github.com/tao-cpp/algorithm/blob/master/include/tao/algorithm/partition/partition.hpp#L58
 
 var r = range_bounded("f", "l");
 var r2 = range_bounded("j", "l");
 var r3 = range_bounded("p", "l");
+
+skip_debug("rotate");
+skip_debug("remainder");
+skip_debug("gcd");
+skip_debug("cycle_from");
+skip_debug("rotate_cycles");
+skip_debug("k_rotate_from_permutation_random_access");
+
+
+
+function remainder(a, b) {
+    return a % b;
+}
+
+function gcd(a, b) {
+    while (b != 0) {
+        var r = remainder(a, b);
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+function cycle_from(i, f) {
+    var tmp = source(i);
+    var j = i;
+    var k = f(i);
+    while ( ! equal(k, i)) {
+        sink(j, source(k));
+        j = k;
+        k = f(k);
+    }
+    sink(j, tmp);
+}
+
+function rotate_cycles(f, m, l, from) {
+    var d = gcd(distance(f, m), distance(m, l));
+
+    while (d != 0) {
+        --d;
+        cycle_from(successor(f, d), from);
+    }
+    return successor(f, distance(m, l));
+}
+
+function k_rotate_from_permutation_random_access(f, m, l) {
+    var k = distance(m, l);
+    var n_minus_k = distance(f, m);
+    var m_prime = successor(f, distance(m, l));
+
+    return function(x) {
+        if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
+        return predecessor(x, k);
+    };
+}
+
+function rotate(f, m, l) {
+    var p = k_rotate_from_permutation_random_access(f, m, l);
+    return rotate_cycles(f, m, l, p);
+}
+
 
 function partition_stable_forward(f, l, p) {
     while (true) {
@@ -410,6 +473,97 @@ if ( ! equal(p, l)) {
     print('partition point: ' + source(p));
 }`
 
+
+,partition_stable_inplace_n:
+`//Stepanov Algorithm [Stepanov 1987]
+var r = range_counted("f", "n");
+
+skip_debug("half_nonnegative");
+skip_debug("rotate");
+skip_debug("remainder");
+skip_debug("gcd");
+skip_debug("cycle_from");
+skip_debug("rotate_cycles");
+skip_debug("k_rotate_from_permutation_random_access");
+
+function half_nonnegative(n) {
+    return n >> 1;
+}
+
+function remainder(a, b) {
+    return a % b;
+}
+
+function gcd(a, b) {
+    while (b != 0) {
+        var r = remainder(a, b);
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+function cycle_from(i, f) {
+    var tmp = source(i);
+    var j = i;
+    var k = f(i);
+    while ( ! equal(k, i)) {
+        sink(j, source(k));
+        j = k;
+        k = f(k);
+    }
+    sink(j, tmp);
+}
+
+function rotate_cycles(f, m, l, from) {
+    var d = gcd(distance(f, m), distance(m, l));
+
+    while (d != 0) {
+        --d;
+        cycle_from(successor(f, d), from);
+    }
+    return successor(f, distance(m, l));
+}
+
+function k_rotate_from_permutation_random_access(f, m, l) {
+    var k = distance(m, l);
+    var n_minus_k = distance(f, m);
+    var m_prime = successor(f, distance(m, l));
+
+    return function(x) {
+        if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
+        return predecessor(x, k);
+    };
+}
+
+function rotate(f, m, l) {
+    var p = k_rotate_from_permutation_random_access(f, m, l);
+    return rotate_cycles(f, m, l, p);
+}
+
+function partition_stable_inplace_n(f, n, p) {
+    if (n == 0) return [f, f];
+    if (n == 1) {
+        var l = successor(f);
+        if (p(source(f))) l = f;
+        return [f, l];
+    }
+    var i = partition_stable_inplace_n(f, half_nonnegative(n), p);
+    var j = partition_stable_inplace_n(i[1], n - half_nonnegative(n), p);
+    return [rotate(i[0], i[1], j[0]), j[1]];
+}
+
+var even = predicate(function(x) {return x % 2 == 0;}, "even");
+var d = add_sequence(random_array(), "d", even);
+var f = begin(d);
+// var l = end(d);
+
+var p = partition_stable_inplace_n(f, size(d), even);
+
+var p0 = p[0];
+var p1 = p[1];
+print('...');
+`
 
 
 ,partition_point_n:
