@@ -382,67 +382,6 @@ var r = range_bounded("f", "l");
 var r2 = range_bounded("j", "l");
 var r3 = range_bounded("p", "l");
 
-skip_debug("rotate");
-skip_debug("remainder");
-skip_debug("gcd");
-skip_debug("cycle_from");
-skip_debug("rotate_cycles");
-skip_debug("k_rotate_from_permutation_random_access");
-
-
-
-function remainder(a, b) {
-    return a % b;
-}
-
-function gcd(a, b) {
-    while (b != 0) {
-        var r = remainder(a, b);
-        a = b;
-        b = r;
-    }
-    return a;
-}
-
-function cycle_from(i, f) {
-    var tmp = source(i);
-    var j = i;
-    var k = f(i);
-    while ( ! equal(k, i)) {
-        sink(j, source(k));
-        j = k;
-        k = f(k);
-    }
-    sink(j, tmp);
-}
-
-function rotate_cycles(f, m, l, from) {
-    var d = gcd(distance(f, m), distance(m, l));
-
-    while (d != 0) {
-        --d;
-        cycle_from(successor(f, d), from);
-    }
-    return successor(f, distance(m, l));
-}
-
-function k_rotate_from_permutation_random_access(f, m, l) {
-    var k = distance(m, l);
-    var n_minus_k = distance(f, m);
-    var m_prime = successor(f, distance(m, l));
-
-    return function(x) {
-        if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
-        return predecessor(x, k);
-    };
-}
-
-function rotate(f, m, l) {
-    var p = k_rotate_from_permutation_random_access(f, m, l);
-    return rotate_cycles(f, m, l, p);
-}
-
-
 function partition_stable_forward(f, l, p) {
     while (true) {
         if (equal(f, l)) return f;
@@ -455,7 +394,7 @@ function partition_stable_forward(f, l, p) {
 
     while ( ! equal(j, l)) {
         if ( ! p(source(j))) {
-            rotate(f, j, successor(j));     //TODO: refine rotate(...)
+            tao_rotate(f, j, successor(j));
             f = successor(f);
         }
         j = successor(j);
@@ -478,87 +417,33 @@ if ( ! equal(p, l)) {
 `//Stepanov Algorithm [Stepanov 1987]
 var r = range_counted("f", "n");
 
-skip_debug("half_nonnegative");
-skip_debug("rotate");
-skip_debug("remainder");
-skip_debug("gcd");
-skip_debug("cycle_from");
-skip_debug("rotate_cycles");
-skip_debug("k_rotate_from_permutation_random_access");
-
-function half_nonnegative(n) {
-    return n >> 1;
-}
-
-function remainder(a, b) {
-    return a % b;
-}
-
-function gcd(a, b) {
-    while (b != 0) {
-        var r = remainder(a, b);
-        a = b;
-        b = r;
-    }
-    return a;
-}
-
-function cycle_from(i, f) {
-    var tmp = source(i);
-    var j = i;
-    var k = f(i);
-    while ( ! equal(k, i)) {
-        sink(j, source(k));
-        j = k;
-        k = f(k);
-    }
-    sink(j, tmp);
-}
-
-function rotate_cycles(f, m, l, from) {
-    var d = gcd(distance(f, m), distance(m, l));
-
-    while (d != 0) {
-        --d;
-        cycle_from(successor(f, d), from);
-    }
-    return successor(f, distance(m, l));
-}
-
-function k_rotate_from_permutation_random_access(f, m, l) {
-    var k = distance(m, l);
-    var n_minus_k = distance(f, m);
-    var m_prime = successor(f, distance(m, l));
-
-    return function(x) {
-        if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
-        return predecessor(x, k);
-    };
-}
-
-function rotate(f, m, l) {
-    var p = k_rotate_from_permutation_random_access(f, m, l);
-    return rotate_cycles(f, m, l, p);
-}
-
 function partition_stable_inplace_n(f, n, p) {
-    if (n == 0) return [f, f];
+    if (n == 0) {
+        return [f, f];
+    }
+
     if (n == 1) {
         var l = successor(f);
-        if (p(source(f))) l = f;
-        return [f, l];
+        // print(source(f));
+        if (p(source(f))) {
+            return [f, l];
+        }
+        return [l, l];
     }
-    var i = partition_stable_inplace_n(f, half_nonnegative(n), p);
-    var j = partition_stable_inplace_n(i[1], n - half_nonnegative(n), p);
-    return [rotate(i[0], i[1], j[0]), j[1]];
+
+    var i = partition_stable_inplace_n(f, tao_half_nonnegative(n), p);
+    var i0 = i[0];
+    var i1 = i[1];
+    var j = partition_stable_inplace_n(i1, n - tao_half_nonnegative(n), p);
+    var j0 = j[0];
+    var j1 = j[1];
+    return [tao_rotate(i0, i1, j0), j1];
 }
 
 var even = predicate(function(x) {return x % 2 == 0;}, "even");
 var d = add_sequence(random_array(), "d", even);
-var f = begin(d);
-// var l = end(d);
-
-var p = partition_stable_inplace_n(f, size(d), even);
+print(d);
+var p = partition_stable_inplace_n(begin(d), size(d), even);
 
 var p0 = p[0];
 var p1 = p[1];
@@ -1141,6 +1026,7 @@ function rotate_random_access_nontrivial(f, m, l) {
 }
 
 var s = add_sequence(random_array(16), "s");
+fill_elem(s, 1, "#ff9191");
 print(s);
 rotate_random_access_nontrivial(begin(s), successor(begin(s), 6), end(s));
 print(s);
@@ -1347,6 +1233,12 @@ function Sequence(name, data, elements, colors, capacity) {
     this.colors = colors;
     this.capacity = capacity;
 }
+
+function Element(value, color) {
+    this.value = value;
+    this.color = color;
+}
+
 
 function RangeBounded(fname, lname) {
     this.fname = fname;
@@ -1729,6 +1621,7 @@ function initFunctions(interpreter, scope) {
 
     var source_wrapper = function(it) {
         var data = it.data.data;
+        var colors = it.data.colors;
         var max = data.length;
 
         if (it.index >= max) {
@@ -1737,19 +1630,23 @@ function initFunctions(interpreter, scope) {
             return;
         }
 
-        var s = data[it.index];
-        addLogSource(it, s)
+        var value = data[it.index];
+        var color = colors[it.index];
+        addLogSource(it, value)
 
         //TODO
         // ++stats_pred_appls;
         // updateStatus();
 
-        return s;
+        var elem = new Element(value, color);
+        return elem;
+        // return value;
     };
 
     var sink_wrapper = function(it, x) {
         var data = it.data.data;
         var elements = it.data.elements;
+        var colors = it.data.colors;
 
         var max = data.length;
         if (it.index >= max) {
@@ -1758,10 +1655,17 @@ function initFunctions(interpreter, scope) {
             return;
         }
 
-        addLogSink(it, x)
-        
-        data[it.index] = x;
-        elements[it.index].group.children[1].value = x;
+        console.log(x)
+        if (x instanceof Element) {
+            addLogSink(it, x.value)
+            data[it.index] = x.value;
+            elements[it.index].group.children[1].value = x.value;
+            colors[it.index] = x.color;
+        } else {
+            addLogSink(it, x)
+            data[it.index] = x;
+            elements[it.index].group.children[1].value = x;
+        }
 
         if (log_stats_enabled) {
             ++stats_assigments;
@@ -1992,12 +1896,37 @@ function initFunctions(interpreter, scope) {
 }
 
 function callPredCode() {
-    return 'function call_predicate(p, name, x){var res = p(x); call_predicate_internal(name, x, res); return res;};\n'
-         + 'function predicate(p, name) {return function(x) {return call_predicate(p, name, x);};}\n'
-         + 'function call_relation(r, name, x, y){var res = r(x, y); call_relation_internal(name, x, y, res); return res;}\n'
-         + 'function relation(r, name){return function(x, y){return call_relation(r, name, x, y);};}\n'
-         + 'function random_int(from, to) {if ( ! from) from = 0;if ( ! to) to = 99;return Math.floor(Math.random() * to) + from;}\n'
-         + 'function random_array(n, from, to) {if ( ! n) n = 10;if ( ! from) from = 0;if ( ! to) to = 99;var res = []; while (n != 0) { var rand = Math.floor(Math.random() * to) + from; res.push(rand); --n;} return res; }\n';
+    return `function call_predicate(p, name, x){var res = p(x); call_predicate_internal(name, x, res); return res;};
+         function predicate(p, name) {
+             return function(x) {
+                if (x instanceof Element) {
+                    return call_predicate(p, name, x.value);
+                }
+
+                //  print("pepe"); 
+                //  print(x); 
+                 return call_predicate(p, name, x);
+             };
+         }
+         function call_relation(r, name, x, y){var res = r(x, y); call_relation_internal(name, x, y, res); return res;}
+         function relation(r, name){return function(x, y){
+
+            if (x instanceof Element) {
+                var x_value = x.value;
+            } else {
+                var x_value = x;
+            }
+
+            if (y instanceof Element) {
+                var y_value = y.value;
+            } else {
+                var y_value = y;
+            }
+
+            return call_relation(r, name, x_value, y_value);};
+        }
+         function random_int(from, to) {if ( ! from) from = 0;if ( ! to) to = 99;return Math.floor(Math.random() * to) + from;}
+         function random_array(n, from, to) {if ( ! n) n = 10;if ( ! from) from = 0;if ( ! to) to = 99;var res = []; while (n != 0) { var rand = Math.floor(Math.random() * to) + from; res.push(rand); --n;} return res; }\n`;
 }
 
 function addSequenceCode() {
@@ -2020,8 +1949,71 @@ function addSequenceCode() {
     '}'+ '\n'
 }
 
+function algorithmsCode() {
+
+    return `
+    function tao_half_nonnegative(n) {
+        return n >> 1;
+    }
+    
+    function tao_remainder(a, b) {
+        return a % b;
+    }
+    
+    function tao_gcd(a, b) {
+        while (b != 0) {
+            var r = tao_remainder(a, b);
+            a = b;
+            b = r;
+        }
+        return a;
+    }
+    
+    function tao_cycle_from(i, f) {
+        var tmp = source(i);
+        var j = i;
+        var k = f(i);
+        while ( ! equal(k, i)) {
+            sink(j, source(k));
+            j = k;
+            k = f(k);
+        }
+        sink(j, tmp);
+    }
+    
+    function tao_rotate_cycles(f, m, l, from) {
+        var d = tao_gcd(distance(f, m), distance(m, l));
+    
+        while (d != 0) {
+            --d;
+            tao_cycle_from(successor(f, d), from);
+        }
+        return successor(f, distance(m, l));
+    }
+    
+    function tao_k_rotate_from_permutation_random_access(f, m, l) {
+        var k = distance(m, l);
+        var n_minus_k = distance(f, m);
+        var m_prime = successor(f, distance(m, l));
+    
+        return function(x) {
+            if ( distance(x, m_prime) > 0) return successor(x, n_minus_k);
+            return predecessor(x, k);
+        };
+    }
+    
+    function tao_rotate(f, m, l) {
+        var p = tao_k_rotate_from_permutation_random_access(f, m, l);
+        return tao_rotate_cycles(f, m, l, p);
+    }
+  
+    `;
+
+}
+
+
 function invisibleCode() {
-    return callPredCode() + addSequenceCode();
+    return callPredCode() + addSequenceCode() + algorithmsCode();
 }
 
 
@@ -2151,11 +2143,11 @@ function startButton() {
     }
 }
 
-function addVariable(name, value, seqn) {
+function addVariable(name, value, seqn, color) {
 
     var initTop = defaultTopMargin + seqn * sequenceTotalHeight;
 
-    var elems = drawVariable(two, name, value, initTop);
+    var elems = drawVariable(two, name, value, initTop, color);
 
     var retobj = {
         name: name,
@@ -2537,6 +2529,8 @@ function drawScope(scope) {
                 } else if (value instanceof RangeBounded) {
                 } else if (value instanceof RangeCounted) {
                 } else if (value instanceof Interpreter.Object) {
+                } else if (value instanceof Element) {
+                    vars_internal.push({key: key, value: value.value, color: value.color});
                 } else {
                     // addVariable(key, value, seqn);
                     vars_internal.push({key: key, value: value});
@@ -2557,8 +2551,9 @@ function drawScope(scope) {
     for (var i in vars_internal) {
         var key = vars_internal[i].key;
         var value = vars_internal[i].value;
+        var color = vars_internal[i].color;
 
-        addVariable(key, value, seqn);
+        addVariable(key, value, seqn, color);
     }
 
     // console.log(ranges);
@@ -2817,6 +2812,7 @@ function stepButton() {
         if (prevNode != null && prevNode.type == 'VariableDeclaration') {
             if (prevNode.declarations[0].init.callee && prevNode.declarations[0].init.callee.name == "source") {
                 if (log_stats_enabled) {
+                    console.log('pepe')
                     ++stats_assigments;
                     updateStatus();
                 }

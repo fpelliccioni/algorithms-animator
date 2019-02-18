@@ -285,7 +285,7 @@ function last_elem(dic) {
     return dic[key];
 }
 
-function drawVariable(two, name, value, initTop) {
+function drawVariable(two, name, value, initTop, color) {
     
     // console.log(name)
     // console.log(value)
@@ -315,7 +315,7 @@ function drawVariable(two, name, value, initTop) {
     // console.log('drawNamedElementSimple')
 
     // var e = drawNamedElementSimple(two,  leftMargin + rectWidth / 2, topMargin + 30, name, value);
-    var e = drawNamedElementSimple(two, leftMargin, topMargin, name, value);
+    var e = drawNamedElementSimple(two, leftMargin, topMargin, name, value, color);
     elements.push(e)
 
     two.update();
