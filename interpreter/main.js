@@ -1864,6 +1864,9 @@ function initFunctions(interpreter, scope) {
     
 
     // interpreter.setProperty(scope, 'alert',          interpreter.createNativeFunction(alert_wrapper));
+
+    
+
     interpreter.setProperty(scope, 'print',          interpreter.createNativeFunction(print_wrapper));
     interpreter.setProperty(scope, 'successor',      interpreter.createNativeFunction(successor_wrapper));
     interpreter.setProperty(scope, 'predecessor',    interpreter.createNativeFunction(predecessor_wrapper));
