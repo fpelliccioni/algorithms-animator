@@ -172,6 +172,9 @@ function drawIterator(two, elem, text, color = '#99ff99') {
 function drawArray(two, name, id, arr, colors, capacity) {
     
     // console.log("drawArray")
+    // console.log(arr)
+
+    // console.log("drawArray")
     // console.log(capacity)
 
     if (capacity == undefined) {
@@ -197,6 +200,7 @@ function drawArray(two, name, id, arr, colors, capacity) {
 
     for (let index = 0; index < arr.length; ++index) {
         let value = arr[index];
+        // console.log(value);
         let color = colors[index];
         var e = drawElement(two,  leftMargin + rectWidth / 2 + index * rectWidth, topMargin, value, index, color);
         elements.push(e)
