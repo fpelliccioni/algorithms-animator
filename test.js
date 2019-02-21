@@ -425,6 +425,51 @@ function drawCountedRange(f, n) {
 }
 
 
+
+
+function drawInfiniteRange(f) {
+    
+    var color = iterators_gui[f.name].children[0].fill;
+    // console.log(color);
+
+    var n = f.data.data.length - f.index + 1;
+
+    var elem = f.data.elements[f.index];
+    var x = elem.rect.translation._x;
+    var y = elem.rect.translation._y + elem.rect.height / 2 + escale_y(24);
+
+    if (n != 0) {
+        // var elem_last = f.data.elements[f.index + n - 1];
+        // var x_last = elem_last.rect.translation._x + rectWidth / 2;
+        var x_last = x + rectWidth * n; // + rectWidth / 2;
+    }
+
+
+    var line = two.makeLine(x + escale_x(10), y, x_last, y);
+    line.stroke = color;
+    line.fill = color;
+
+    console.log(line);
+
+    // var line2 = two.makeLine(x_last, y, x_last, y - escale_y(15));
+    // line2.stroke = color;
+    // line2.fill = color;
+
+
+    var line3 = two.makeLine(x - escale_x(10), y, x - rectWidth / 2, y);
+    line3.stroke = color;
+    line3.fill = color;
+
+    var line4 = two.makeLine(x - rectWidth / 2, y, x - rectWidth / 2, y - escale_y(15));
+    line4.stroke = color;
+    line4.fill = color;
+
+
+    two.update();
+
+}
+
+
 function drawBoundedRange(f, l) {
     // console.log(f);
     // console.log(l);
