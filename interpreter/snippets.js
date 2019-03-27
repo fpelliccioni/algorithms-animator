@@ -80,7 +80,7 @@ var snippets = {
 find: 
 `var r = range_bounded('f', 'l');
 function find(f, l, x) {
-    while ( ! equal(f, l) && x != source(f)) {
+    while ( ! equal(f, l) && x != source(f, false)) {
         f = successor(f)
     }
     return f;
@@ -98,7 +98,7 @@ if ( ! equal(f, l)) {
 ,find_n: 
 `var _r = range_counted('f', 'n');
 function find_n(f, n, x) {
-    while ( n != 0 && x != source(f)) {
+    while ( n != 0 && x != source(f, false)) {
         f = successor(f)
         --n;
     }
@@ -160,7 +160,7 @@ if ( ! equal(it, f)) {
 ,find_unguarded: 
 `var r = range_infinite('f');
 function find_unguarded(f, x) {
-    while (x != source(f)) {
+    while (x != source(f, false)) {
         f = successor(f)
     }
     return f;
@@ -170,7 +170,7 @@ var x = 42;
 
 var d = sequence(random_array(), "d");
 var l = predecessor(end(d));
-var tmp = source(l);
+var tmp = source(l, false);
 sink(l, x);
 
 var f = begin(d);

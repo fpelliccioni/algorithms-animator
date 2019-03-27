@@ -335,10 +335,11 @@ function initFunctions(interpreter, scope) {
 
     var print_wrapper = function(text) {
 
-        // if (text instanceof Element) {
-        //     console.log('Element ****');
-        //     console.log(text);
-        // }
+        if (text instanceof Element) {
+            console.log('Element ****');
+            console.log(text);
+            text = text.value;
+        }
 
 
         if (text instanceof Sequence) {
@@ -545,7 +546,7 @@ function initFunctions(interpreter, scope) {
         return s;
     };
 
-    var source_wrapper = function(it) {
+    var source_wrapper = function(it, returnElem = true) {
         var data = it.data.data;
         var colors = it.data.colors;
         var max = data.length;
@@ -564,9 +565,12 @@ function initFunctions(interpreter, scope) {
         // ++stats_pred_appls;
         // updateStatus();
 
-        // var elem = new Element(value, color);
-        // var elem = element_wrapper(value, color);
-        // return elem;
+        if (returnElem) {
+            var elem = new Element(value, color);
+            // var elem = element_wrapper(value, color);
+            return elem;
+        }
+
         return value;
     };
 
@@ -668,6 +672,8 @@ function initFunctions(interpreter, scope) {
         var data_b = b.data.data;
         var colors_a = a.data.colors;
         var colors_b = b.data.colors;
+        var data_str_a = a.data.data_str;
+        var data_str_b = b.data.data_str;
 
         var tmp_color = colors_a[a.index];
         colors_a[a.index] = colors_b[b.index];
@@ -676,6 +682,11 @@ function initFunctions(interpreter, scope) {
         var tmp = source_value(a);
         data_a[a.index] = source_value(b);
         data_b[b.index] = tmp;
+
+        tmp = data_str_a[a.index];
+        data_str_a[a.index] = data_str_b[b.index];
+        data_str_b[b.index] = tmp;
+
 
         if (log_stats_enabled) {
             ++stats_swaps;
@@ -1126,14 +1137,14 @@ function algorithmsCode() {
         },
 
         find: function(f, l, x) {
-            while ( ! equal(f, l) && x != source(f)) {
+            while ( ! equal(f, l) && x != source(f, false)) {
                 f = successor(f)
             }
             return f;
         },
 
         find_n: function(f, n, x) {
-            while ( n != 0 && x != source(f)) {
+            while ( n != 0 && x != source(f, false)) {
                 f = successor(f)
                 --n;
             }
