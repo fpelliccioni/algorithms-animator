@@ -298,6 +298,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 return res; 
             }
 
+            function wait(ms){
+                var start = new Date().getTime();
+                var end = start;
+                while(end < start + ms) {
+                    end = new Date().getTime();
+                }
+            }
 
             var group = add_sequence(random_array(), "s1");
             var range0_len = Math.floor(Math.random() * 9) + 1; 
@@ -332,6 +339,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
             var step = 0;
+            // two.update();
+            var svgString = sequence.innerHTML;
+            console.log('-------------------------------------------')
+            console.log(step)
+            console.log(svgString)
+
+            wait(2000);
+
 
             two.bind('update', function(frameCount) {
 
@@ -343,6 +358,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                         }
                     } else {
                         step = 1;
+                        var svgString = sequence.innerHTML;
+                        console.log('-------------------------------------------')
+                        console.log(step)
+                        console.log(svgString)
+
+                        wait(2000);
+
                     }
 
                 } else if (step == 1) {
@@ -369,6 +391,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                         }
                     } else {
                         step = 2;   
+
+                        var svgString = sequence.innerHTML;
+                        console.log('-------------------------------------------')
+                        console.log(step)
+                        console.log(svgString)
+
+                        wait(2000);
+
                     }
 
 
@@ -393,6 +423,12 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                         // elem9.translation.set(elem9.translation._x, elem9.translation._y - 1);
                     } else {
                         step = 3;
+                        var svgString = sequence.innerHTML;
+                        console.log('-------------------------------------------')
+                        console.log(step)
+                        console.log(svgString)
+
+                        wait(2000);
                     }
                 }
 
